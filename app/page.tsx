@@ -1,5 +1,5 @@
 import { GoldenList } from "./components/GoldenList";
-import { GoldenVine, FloatingLeaves } from "./components/GoldenDecals";
+import { HangingVine, SunGlow, FloatingLeaves } from "./components/GoldenDecals";
 import { Testimonials } from "./components/Testimonials";
 import { ServiceCard } from "./components/ServiceCard";
 import { featuredServices } from "./data/services";
@@ -18,7 +18,7 @@ export default async function Home() {
   const headline = splitHeadline(content.heroHeadline);
   return <>
     {content.announcement && <div className="site-announcement"><span>✦</span>{content.announcement}</div>}
-    <section className="hero shell"><GoldenVine className="vine-hero" /><div className="hero-copy"><p className="eyebrow">Golden Esthetics · Licensed Esthetician</p><h1>{headline.first}{headline.second && <><br/><em>{headline.second}</em></>}</h1><p className="lede">{content.heroSupportingCopy}</p><div className="button-row"><a className="button button-primary" href="/find-my-facial">Try Sparrow Skin Match <span>✦</span></a><a className="button button-quiet" href="/services">Explore services</a></div><div className="trust-row"><span>✦ Personalized care</span><span>✦ Thoughtful treatments</span><span>✦ A glow that feels like you</span></div></div><div className="hero-portrait"><div className="portrait-placeholder">
+    <section className="hero shell"><SunGlow /><HangingVine className="vine-hero-l" /><HangingVine className="vine-hero-r" flip /><div className="hero-copy"><p className="eyebrow">Golden Esthetics · Licensed Esthetician</p><h1>{headline.first}{headline.second && <><br/><em>{headline.second}</em></>}</h1><p className="lede">{content.heroSupportingCopy}</p><div className="button-row"><a className="button button-primary" href="/find-my-facial">Try Sparrow Skin Match <span>✦</span></a><a className="button button-quiet" href="/services">Explore services</a></div><div className="trust-row"><span>✦ Personalized care</span><span>✦ Thoughtful treatments</span><span>✦ A glow that feels like you</span></div></div><div className="hero-portrait"><div className="portrait-placeholder">
   <img
     src="/kinnley profile pic.jpg"
     alt="McKinnley of Golden Esthetics"
@@ -32,6 +32,6 @@ export default async function Home() {
     <section id="first-visit" className="section shell first-time"><div className="section-heading"><div><p className="eyebrow">Your first visit</p><h2>New here? You’re in the right place.</h2></div></div><div className="steps-grid">{[["01","Find your service","Use Find My Facial or explore the treatment menu."],["02","Book with Square","Choose a time through Golden Esthetics’ secure Square page."],["03","Come as you are","McKinnley will talk through your goals before your service."]].map(step => <article key={step[0]}><span>{step[0]}</span><h3>{step[1]}</h3><p>{step[2]}</p></article>)}</div><div className="student-note"><span>Student glow ✦</span><strong>Students receive 15% off with student ID.</strong><small>Final eligibility and pricing are confirmed by Golden Esthetics.</small></div></section>
     <Testimonials/>
     <GoldenList/>
-    <section className="booking-cta"><GoldenVine className="vine-cta" flip /><FloatingLeaves /><div className="shell"><p className="eyebrow">Your glow is waiting</p><h2>Ready when you are.</h2><p>Choose your service and book directly with Golden Esthetics.</p><a className="button button-primary" href="https://golden-esthetics-101699.square.site/" target="_blank" rel="noreferrer">Book an Appointment ↗</a></div></section>
+    <section className="booking-cta"><HangingVine className="vine-cta" flip /><FloatingLeaves /><div className="shell"><p className="eyebrow">Your glow is waiting</p><h2>Ready when you are.</h2><p>Choose your service and book directly with Golden Esthetics.</p><a className="button button-primary" href="https://golden-esthetics-101699.square.site/" target="_blank" rel="noreferrer">Book an Appointment ↗</a></div></section>
   </>;
 }

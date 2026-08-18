@@ -67,3 +67,20 @@ body:has(.admin-app)>.site-header,body:has(.admin-app)>footer,body:has(.admin-ap
 .mobile-sheet-handle{display:block;width:40px;height:4px;border-radius:99px;background:var(--line);margin:4px auto 14px}.mobile-sheet-title{font:22px Georgia;margin:0 0 12px}
 .mobile-sheet-links{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mobile-sheet-links a{display:block;padding:14px 14px;border:1px solid var(--line);border-radius:10px;background:var(--cream);font-size:14px;color:var(--deep)}
 .mobile-sheet-book{display:block;text-align:center;margin-top:12px;padding:15px;border-radius:10px;background:var(--deep);color:#fff;font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+/* --- richer hanging vines + sun glow (v2 decals) --- */
+.hero{overflow:hidden}
+.hanging-vine{position:absolute;top:0;z-index:0;width:225px;opacity:.62}.hanging-vine svg{width:100%;height:auto;display:block;overflow:visible}.hanging-vine.gd-flip{transform:scaleX(-1)}
+.hv-stem{fill:none;stroke:#9c7d2e;stroke-width:1.4;stroke-linecap:round;opacity:.7}
+.hv-berry{fill:#b89838}
+.hv-leaf path{fill:#a8863a}.hv-1 path{fill:#8f9a79}.hv-2 path{fill:#bb9a3f}
+.vine-hero-l{left:-26px}.vine-hero-r{right:-26px}.vine-cta{left:-26px;width:200px;opacity:.5}
+.sun-glow{position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 78% 8%,rgba(201,169,78,.28),rgba(201,169,78,.08) 38%,transparent 62%)}
+.gd-leaf{width:22px;height:22px;overflow:visible}.gd-float path{fill:#a8863a}
+@media(prefers-reduced-motion:no-preference){
+ .hv-drift{transform-origin:120px 0;animation:gd-sway 9s ease-in-out infinite}
+ .hv-leaf path{transform-box:fill-box;transform-origin:12px 20px;animation:gd-flutter 6s ease-in-out infinite}
+ .hv-1 path{animation-duration:7s;animation-delay:-1.5s}.hv-2 path{animation-delay:-3s}
+ .sun-glow{animation:gd-glow 9s ease-in-out infinite}
+}
+@keyframes gd-glow{0%,100%{opacity:.85}50%{opacity:1}}
+@media(max-width:720px){.hanging-vine{width:150px;opacity:.5}.vine-cta{width:130px}}

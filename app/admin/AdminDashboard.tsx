@@ -212,6 +212,7 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
   return <div className="admin-app">
     <aside className="admin-sidebar">
       <div className="admin-logo"><span>GE</span><div><strong>Golden Esthetics</strong><small>Business dashboard</small></div></div>
+      <select className="admin-tab-select" value={tab} onChange={event => setTab(event.target.value)} aria-label="Choose a section">{tabs.map(item => <option key={item} value={item}>{item}</option>)}</select>
       <nav>{tabs.map(item => <button className={tab === item ? "active" : ""} key={item} onClick={() => setTab(item)}>{item}</button>)}</nav>
       <div className="admin-user"><span>{user.displayName.slice(0, 1)}</span><div><strong>{user.displayName}</strong><small>{user.role}</small></div><button onClick={logout}>Sign out</button></div>
     </aside>

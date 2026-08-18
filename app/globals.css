@@ -377,3 +377,13 @@ body{font-family:'Jost',system-ui,sans-serif}
 .skin-test-head strong{display:flex;flex-direction:column;gap:2px;font:19px Georgia;color:#202820}
 .skin-test-head strong em{font:italic 13px Georgia;color:var(--gold)}
 .field-label input{padding:15px;border:1px solid var(--line);background:#faf7ef;font:16px/1.5 Arial}
+
+/* Admin mobile nav: dropdown picker instead of a cramped horizontal tab strip */
+.admin-tab-select{display:none}
+@media(max-width:850px){
+.admin-sidebar{flex-direction:row;align-items:center;gap:12px;padding:10px 14px;height:auto}
+.admin-logo{padding:0;border:0;flex:0 0 auto}
+.admin-logo>div{display:none}
+.admin-sidebar nav{display:none}
+.admin-tab-select{display:block;flex:1;min-width:0;min-height:46px;padding:11px 40px 11px 15px;border:1px solid #58664f;border-radius:11px;background-color:#eef0e7;color:#202820;font:16px Arial,sans-serif;-webkit-appearance:none;appearance:none;background-repeat:no-repeat;background-position:right 14px center;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23202820' stroke-width='1.7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+}

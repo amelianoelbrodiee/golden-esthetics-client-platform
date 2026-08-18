@@ -300,7 +300,6 @@ body{font-family:'Jost',system-ui,sans-serif}
 @media(max-width:800px){
  .site-header{position:static;top:auto}
  .category-nav{position:static;top:auto}
- .mobile-nav{position:static;transform:none;pointer-events:auto}
  .mobile-nav.is-hidden{transform:none}
- body{padding-bottom:0}
+ body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
 }

@@ -315,3 +315,7 @@ body{font-family:'Jost',system-ui,sans-serif}
 .insta-follow .button{margin-top:10px}
 .booking-cta .button+.button{margin-left:10px}
 @media(max-width:600px){.booking-cta .button{display:flex;margin:10px auto 0}.booking-cta .button+.button{margin-left:auto}}
+
+/* Instagram live feed embed in gallery */
+.gallery-ig-feed{width:100%;max-width:940px;margin:26px auto 22px}
+.lightwidget-widget{width:100%;border:0;overflow:hidden}

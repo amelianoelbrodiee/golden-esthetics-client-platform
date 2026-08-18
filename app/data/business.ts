@@ -2,6 +2,7 @@ export const business = {
   name: "Golden Esthetics", ownerName: "McKinnley Golden",
   email: "goldenesthetics12@gmail.com", phone: "(864) 973-1585",
   instagram: "@goldenn.estheticss", instagramUrl: "https://www.instagram.com/goldenn.estheticss/",
+  instagramEmbedSrc: "", // LightWidget iframe URL once McKinnley connects her IG (e.g. "//lightwidget.com/widgets/<id>.html")
   squareBookingBaseUrl: "https://golden-esthetics-101699.square.site/",
   salon: "Eclipse Salon & Spa", addressLocality: "Seneca", addressRegion: "SC", addressCountry: "US",
   location: "Seneca, South Carolina", hours: "By appointment", studentDiscountPercent: 15,

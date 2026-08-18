@@ -4,14 +4,17 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 const INTRO_STORAGE_KEY = "golden-esthetics-opening-v6-seen";
 
+// C major pentatonic, high + airy — the most consonant, peaceful scale there is.
+// [frequency, startTime] cascading gently upward like drifting fairy dust.
 const sparkleChimes = [
-  [784, 0], [1175, 0.14], [1568, 0.32], [2093, 0.5], [1319, 0.76],
-  [1760, 1.02], [2349, 1.3], [1568, 1.62], [2637, 1.94], [2093, 2.28],
+  [1046.5, 0.0], [1318.5, 0.26], [1568.0, 0.54], [1760.0, 0.86],
+  [2093.0, 1.18], [1568.0, 1.5], [2349.3, 1.82], [2093.0, 2.16],
+  [2637.0, 2.5], [3136.0, 2.86],
 ] as const;
 
 function createSparkleWavUrl() {
-  const sampleRate = 22050;
-  const duration = 3.8;
+  const sampleRate = 44100;
+  const duration = 4.6;
   const samples = Math.floor(sampleRate * duration);
   const buffer = new ArrayBuffer(44 + samples * 2);
   const view = new DataView(buffer);
@@ -33,25 +36,44 @@ function createSparkleWavUrl() {
   writeAscii(36, "data");
   view.setUint32(40, samples * 2, true);
 
+  // Soft harmonic bell: gentle attack, long airy decay, quiet inharmonic shimmer on top.
+  const bell = (localTime: number, frequency: number) => {
+    const attack = Math.min(1, localTime / 0.05);
+    const decay = Math.exp(-localTime * 2.4);
+    const body =
+      Math.sin(2 * Math.PI * frequency * localTime) +
+      0.5 * Math.sin(2 * Math.PI * frequency * 2 * localTime) +
+      0.22 * Math.sin(2 * Math.PI * frequency * 3.01 * localTime) +
+      0.12 * Math.sin(2 * Math.PI * frequency * 4.2 * localTime);
+    return body * attack * decay;
+  };
+
   for (let index = 0; index < samples; index += 1) {
     const time = index / sampleRate;
-    const masterEnvelope = Math.min(1, time / 0.06) * Math.min(1, Math.max(0, (duration - time) / 0.7));
-    const swellEnvelope = Math.sin(Math.PI * Math.min(time / duration, 1));
-    let sample = 0.14 * Math.sin(2 * Math.PI * (330 * time + 42 * time * time)) * swellEnvelope;
+    // Long, soft fades so nothing ever clicks or feels abrupt.
+    const masterEnvelope = Math.min(1, time / 0.35) * Math.min(1, Math.max(0, (duration - time) / 1.4));
 
+    // A whisper-quiet warm pad underneath — two barely-detuned fifths, breathing in and out.
+    const padSwell = Math.sin(Math.PI * Math.min(time / duration, 1));
+    let sample = 0.05 * padSwell * (
+      Math.sin(2 * Math.PI * 523.25 * time) +
+      Math.sin(2 * Math.PI * 784.0 * time * 1.001)
+    );
+
+    // Cascading bell twinkles.
     for (const [frequency, start] of sparkleChimes) {
       const localTime = time - start;
-      if (localTime < 0 || localTime > 0.72) continue;
-      const attack = Math.min(1, localTime / 0.012);
-      const decay = Math.exp(-localTime * 5.8);
-      const chime = Math.sin(2 * Math.PI * frequency * localTime)
-        + 0.46 * Math.sin(2 * Math.PI * frequency * 1.5 * localTime)
-        + 0.22 * Math.sin(2 * Math.PI * frequency * 2.02 * localTime);
-      sample += chime * attack * decay * 0.28;
+      if (localTime < 0 || localTime > 2.2) continue;
+      sample += bell(localTime, frequency) * 0.2;
     }
 
-    const shimmer = (Math.random() * 2 - 1) * 0.025 * Math.exp(-Math.max(0, time - 0.15) * 0.7);
-    const shaped = Math.tanh((sample + shimmer) * 1.45) * masterEnvelope * 0.92;
+    // High "fairy dust" glints — soft filtered sparkle grains, high register, very quiet.
+    const dustPhase = Math.sin(2 * Math.PI * (5200 + 900 * Math.sin(time * 3.1)) * time);
+    const dustGate = Math.max(0, Math.sin(time * 11.0) - 0.72) * 3.4;
+    sample += dustPhase * dustGate * 0.03 * padSwell;
+
+    // Gentle soft-clip (no harsh distortion) and lower overall level for a calm, airy feel.
+    const shaped = Math.tanh(sample * 0.9) * masterEnvelope * 0.6;
     view.setInt16(44 + index * 2, Math.round(shaped * 32767), true);
   }
 

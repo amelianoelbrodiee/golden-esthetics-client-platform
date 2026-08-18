@@ -9,6 +9,7 @@ type Lead = { id: string; name: string; email: string | null; phone: string | nu
 type Admin = { id: string; user_id: string | null; email: string; role: string; display_name: string | null; active: boolean };
 type GalleryItem = { id: string; category: string; service_performed: string | null; caption: string | null; service_date: string | null; before_image_url: string | null; after_image_url: string | null; featured: boolean; active: boolean; photo_consent_confirmed: boolean; sort_order: number; created_at: string };
 type NewsletterCampaign = { subject: string; status: string; sent_count: number; failed_count: number; completed_at: string | null };
+type Testimonial = { id: string; client_name: string; service: string | null; rating: number; quote: string; approved: boolean; featured: boolean; created_at: string };
 export type DashboardData = { metrics: Metric[]; funnel: { label: string; value: number; percent: number }[]; leads: Lead[]; recommendations: { name: string; count: number }[]; goals: { name: string; count: number }[]; admins: Admin[]; galleryItems: GalleryItem[]; siteContent: SiteContent; insights: string[]; hasData: boolean; newsletter: { activeSubscribers: number; sendingConfigured: boolean; lastCampaign: NewsletterCampaign | null } };
 
 export function AdminDashboard({ data, user }: { data: DashboardData; user: { displayName: string; email: string; role: string } }) {
@@ -24,7 +25,40 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
   const [beforePreview, setBeforePreview] = useState("");
   const [afterPreview, setAfterPreview] = useState("");
   const galleryForm = useRef<HTMLFormElement>(null);
-  const tabs = ["Overview", "Content", "Gallery", "Golden List", "Recommendations", "Leads", "Access"];
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [testimonialsLoaded, setTestimonialsLoaded] = useState(false);
+  const [testimonialStatus, setTestimonialStatus] = useState("");
+  const tabs = ["Overview", "Content", "Gallery", "Testimonials", "Golden List", "Recommendations", "Leads", "Access"];
+
+  useEffect(() => {
+    if (tab !== "Testimonials" || testimonialsLoaded) return;
+    fetch("/api/admin/testimonials")
+      .then(response => response.json())
+      .then(body => setTestimonials(Array.isArray(body.testimonials) ? body.testimonials : []))
+      .catch(() => setTestimonialStatus("Testimonials could not be loaded."))
+      .finally(() => setTestimonialsLoaded(true));
+  }, [tab, testimonialsLoaded]);
+
+  async function moderateTestimonial(id: string, updates: Partial<Pick<Testimonial, "approved" | "featured">>) {
+    setTestimonialStatus("Updating…");
+    const response = await fetch(`/api/admin/testimonials/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updates) });
+    const body = await response.json();
+    if (response.ok) {
+      setTestimonials(value => value.map(item => item.id === id ? body.item : item));
+      setTestimonialStatus(body.item.approved ? "Live on the site." : "Hidden from the site.");
+    } else setTestimonialStatus(body.error);
+  }
+
+  async function deleteTestimonial(id: string) {
+    if (!window.confirm("Delete this review permanently? This cannot be undone.")) return;
+    setTestimonialStatus("Deleting…");
+    const response = await fetch(`/api/admin/testimonials/${id}`, { method: "DELETE" });
+    const body = await response.json();
+    if (response.ok) {
+      setTestimonials(value => value.filter(item => item.id !== id));
+      setTestimonialStatus("Review deleted.");
+    } else setTestimonialStatus(body.error);
+  }
 
   useEffect(() => () => {
     if (beforePreview) URL.revokeObjectURL(beforePreview);
@@ -160,6 +194,8 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
           return <article key={item.id}>{preview && <Image src={preview} alt={`${item.service_performed || item.category} gallery preview`} width={360} height={260}/>}<div><p className="eyebrow">{item.category}</p><h3>{item.service_performed || "Golden Esthetics service"}</h3><small>{item.active ? "Published" : "Draft"}{item.featured ? " · Featured" : ""}</small><div className="gallery-admin-actions"><button onClick={() => updateGallery(item.id, { active: !item.active })}>{item.active ? "Unpublish" : "Publish"}</button><button onClick={() => updateGallery(item.id, { featured: !item.featured })}>{item.featured ? "Unfeature" : "Feature"}</button><button className="danger-action" onClick={() => deleteGallery(item.id)}>Delete</button></div></div></article>;
         }) : <div className="admin-panel admin-empty">No portfolio photos have been uploaded yet.</div>}</div>
       </section>}
+
+      {tab === "Testimonials" && <section className="admin-panel leads-panel"><div className="panel-heading"><div><p className="eyebrow">Client reviews</p><h2>Approve what shows on the site</h2></div><span>{testimonials.filter(item => !item.approved).length} awaiting review</span></div>{testimonialStatus && <p className="dashboard-status" role="status">{testimonialStatus}</p>}{!testimonialsLoaded ? <p className="admin-empty">Loading reviews…</p> : testimonials.length ? <div className="lead-table">{testimonials.map(item => <article key={item.id}><div><strong>{item.client_name} · {"✦".repeat(item.rating)}</strong><small>{item.service || "No service noted"} · {new Date(item.created_at).toLocaleDateString()} · {item.approved ? "Published" : "Pending"}{item.featured ? " · Featured" : ""}</small></div><p>“{item.quote}”</p><div className="gallery-admin-actions"><button onClick={() => moderateTestimonial(item.id, { approved: !item.approved })}>{item.approved ? "Unpublish" : "Approve & publish"}</button><button onClick={() => moderateTestimonial(item.id, { featured: !item.featured })}>{item.featured ? "Unfeature" : "Feature"}</button><button className="danger-action" onClick={() => deleteTestimonial(item.id)}>Delete</button></div></article>)}</div> : <p className="admin-empty">No client reviews have been submitted yet.</p>}</section>}
 
       {tab === "Golden List" && <section className="admin-columns newsletter-admin">
         <article className="admin-panel newsletter-schedule-card"><p className="eyebrow">Monthly newsletter</p><h2>The 15th, automatically.</h2><div className="newsletter-date"><strong>15</strong><span>Every month<br/>Morning delivery</span></div><p>A warm, seasonal skincare note is prepared for each month and the Vercel schedule runs at 14:00 UTC—morning in South Carolina.</p><span className={data.newsletter.sendingConfigured ? "setup-ready" : "setup-needed"}>{data.newsletter.sendingConfigured ? "Sending connected" : "Sending address needs connection"}</span></article>

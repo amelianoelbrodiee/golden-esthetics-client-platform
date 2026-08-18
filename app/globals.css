@@ -176,3 +176,41 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:120;o
  .dp-6{animation-delay:0s}.dp-7{animation-delay:4.3s}.dp-8{animation-delay:8.6s}
  .ge-spark{animation-duration:5.5s}
 }
+/* ===== GODDESS PASS: palette / dark hero / celestial / laurel / photos ===== */
+/* #3 richer jewel palette */
+:root{--sage:#7f8b69;--deep:#1d271b;--gold:#9f7d20;--champagne:#dcc07d;--gold2:#c3a24e;--ink:#1e221c}
+/* realistic lily fills */
+.daisy .lily-petal{fill:url(#lilyGrad)}
+.lily-vein{stroke:rgba(178,138,58,.35);stroke-width:.7;fill:none}
+.lily-filament{stroke:#c9a24f;stroke-width:1;fill:none;stroke-linecap:round}
+.lily-anther{fill:#bd7f36}
+.lily-heart{fill:#c9a24f}
+/* #1 dark moody full-bleed hero */
+.hero{position:relative;overflow:hidden;display:block;background:radial-gradient(125% 110% at 76% 0%,#34442f 0%,#1f2b1d 50%,#121a11 100%);color:#f1e8d2}
+.hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1.1fr .9fr;gap:80px;align-items:center;min-height:720px;padding-block:96px}
+.hero .eyebrow{color:var(--champagne)}
+.hero h1{color:#f4ecd6}
+.hero h1 em{color:var(--champagne)}
+.hero .lede{color:#d3d7c7}
+.hero .trust-row{color:#a9af9c}
+.hero .button-primary{background:var(--champagne);color:#1d271b;border-color:var(--champagne)}
+.hero .button-quiet{color:#f1e8d2;border:1px solid rgba(241,232,210,.42);background:transparent}
+.hero .portrait-note{background:rgba(18,24,16,.86);color:#f1e8d2;border-color:rgba(220,192,125,.45)}
+.hero .portrait-placeholder{border-color:rgba(220,192,125,.4)}
+@media(max-width:800px){.hero-inner{grid-template-columns:1fr;gap:40px;min-height:auto;padding-block:58px}}
+/* #2 celestial motifs */
+.celestial{position:absolute;inset:0;z-index:1;pointer-events:none}
+.c-moon{position:absolute;top:11%;right:13%;width:34px;fill:var(--champagne);opacity:.85;filter:drop-shadow(0 0 10px rgba(220,192,125,.5))}
+.c-star{position:absolute;fill:#e9d69a;opacity:.8;transform-box:fill-box;transform-origin:center}
+.c-star-1{top:19%;right:27%;width:14px}.c-star-2{top:33%;right:7%;width:9px}.c-star-3{top:52%;right:31%;width:11px}.c-star-4{top:15%;left:15%;width:10px}
+/* #2 laurel flourish */
+.laurel{display:block;width:200px;height:auto;margin:0 auto 10px}
+.laurel-g{stroke:var(--gold2);stroke-width:1;fill:none;stroke-linecap:round}
+.laurel-g ellipse{fill:var(--gold2);stroke:none;opacity:.92}
+.laurel-dot{fill:var(--gold2);stroke:none}
+/* #4 golden-hour photo treatment */
+.portrait-image,.about-portrait,.gallery-grid img{filter:sepia(.18) saturate(1.08) contrast(1.02) brightness(.97)}
+@media(prefers-reduced-motion:no-preference){
+ .c-star{animation:gd-twinkle 4s ease-in-out infinite}.c-star-2{animation-delay:-1.3s}.c-star-3{animation-delay:-2.4s}.c-star-4{animation-delay:-3.1s}
+ .c-moon{animation:gd-glow 7s ease-in-out infinite}
+}

@@ -328,3 +328,9 @@ body{font-family:'Jost',system-ui,sans-serif}
 .opening-reveal__glitter{z-index:2}
 .opening-reveal{background:#12160d}
 @media(prefers-reduced-motion:reduce){.opening-reveal__shine{display:none}.opening-reveal__logo{opacity:1;transform:none;filter:none;animation:none}}
+
+/* Hero portrait: contain the photo to its frame so it can't overflow / dominate on mobile */
+.portrait-placeholder{overflow:hidden}
+.portrait-image{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block}
+@media(max-width:800px){.portrait-placeholder{height:360px}}
+@media(max-width:600px){.portrait-placeholder{height:320px}}

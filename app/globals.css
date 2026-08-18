@@ -119,3 +119,9 @@ body:has(.admin-app)>.site-header,body:has(.admin-app)>footer,body:has(.admin-ap
 }
 @keyframes gd-sheen{0%{transform:translateX(-120%)}60%,100%{transform:translateX(120%)}}
 @keyframes gd-twinkle{0%,100%{opacity:.5;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
+/* --- golden flowers (replaces vine leaves) --- */
+.hv-bloom ellipse{fill:#dcc576}
+.hv-0 ellipse{fill:#dcc576}.hv-1 ellipse{fill:#e7d290}.hv-2 ellipse{fill:#cbb05a}
+.hv-bloom-center{fill:#b8962f}
+.hv-bud{fill:#cbb05a}
+.gd-bloom-float{width:22px;height:22px;overflow:visible}

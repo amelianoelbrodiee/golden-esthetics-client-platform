@@ -60,3 +60,4 @@ body:has(.admin-app)>.site-header,body:has(.admin-app)>footer,body:has(.admin-ap
 @keyframes gd-sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
 @keyframes gd-drift{0%{transform:translateY(20px) rotate(0);opacity:0}12%{opacity:.6}85%{opacity:.5}100%{transform:translateY(-240px) rotate(55deg);opacity:0}}
 @media(max-width:720px){.golden-vine{width:88px;opacity:.4}.gd-float{transform:scale(.8)}}
+.about-hero{padding-block:70px 18px}.about-portrait-wrap{padding-block:4px 26px}.about-body{padding-block:28px 90px}.about-body p{margin:0 0 18px;line-height:1.85}.about-body h2{margin-top:44px;margin-bottom:14px}.about-body .button-row{margin-top:38px}

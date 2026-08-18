@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return <>
-    <section className="page-hero shell">
+    <section className="page-hero shell about-hero">
       <p className="eyebrow">Meet your esthetician</p>
       <h1>Hi, I&rsquo;m<br /><em>McKinnley.</em></h1>
       <p>Licensed esthetician, skincare lover, and your biggest hype-woman for skin that feels like you.</p>
@@ -16,7 +16,7 @@ export default function Page() {
     <section className="shell about-portrait-wrap">
       <img className="about-portrait" src="/mckinnley-golden.jpg" alt="McKinnley Golden holding a Golden Esthetics card" width={900} height={1279} />
     </section>
-    <section className="legal-page shell">
+    <section className="legal-page shell about-body">
       <p>I&rsquo;m McKinnley Golden, the licensed esthetician behind Golden Esthetics. I created Golden Esthetics as a calm, welcoming space where skincare and beauty finally feel personal &mdash; never rushed, never one-size-fits-all, and never judgmental.</p>
       <p>Every service starts with you: your skin, your goals, and how you actually want to feel when you walk out. Whether it&rsquo;s your very first facial or your hundredth, I&rsquo;ll talk you through what I&rsquo;m doing and why, so you leave knowing your skin a little better than when you came in.</p>
       <h2>What I do</h2>

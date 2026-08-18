@@ -214,3 +214,12 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:120;o
  .c-star{animation:gd-twinkle 4s ease-in-out infinite}.c-star-2{animation-delay:-1.3s}.c-star-3{animation-delay:-2.4s}.c-star-4{animation-delay:-3.1s}
  .c-moon{animation:gd-glow 7s ease-in-out infinite}
 }
+/* readability: soften + reposition hero lilies off the copy */
+.df-hero .daisy{opacity:.2;filter:drop-shadow(0 0 5px rgba(232,212,150,.22))}
+.dp-1{top:7%;right:7%;left:auto;width:60px}
+.dp-2{top:12%;right:6%;width:86px}
+.dp-3{top:44%;right:27%;left:auto;width:64px}
+.dp-4{bottom:22%;right:14%;width:76px}
+.dp-5{bottom:7%;right:33%;left:auto;top:auto;width:50px}
+@media(prefers-reduced-motion:no-preference){.df-hero .daisy{animation-name:daisy-bloom-soft}}
+@keyframes daisy-bloom-soft{0%{opacity:0;transform:scale(0) rotate(-45deg)}12%{opacity:.24}40%{opacity:.24;transform:scale(1) rotate(0)}68%{opacity:.24;transform:scale(1) rotate(0)}88%{opacity:0;transform:scale(1.05) rotate(12deg)}100%{opacity:0}}

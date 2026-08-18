@@ -206,7 +206,8 @@ export function OpeningReveal() {
       role="dialog"
       aria-label="Golden Esthetics opening animation"
     >
-      <div className="opening-reveal__halo" aria-hidden="true" />
+      <div className="opening-reveal__logo" aria-hidden="true" style={{ backgroundImage: "url(/opening.jpg)" }} />
+      <div className="opening-reveal__shine" aria-hidden="true" />
       <div className="opening-reveal__glitter" aria-hidden="true">
         {particles.map((particle) => (
           <i
@@ -223,16 +224,6 @@ export function OpeningReveal() {
           />
         ))}
       </div>
-      <div className="opening-reveal__flare" aria-hidden="true">
-        <span />
-        <span />
-      </div>
-      <div className="opening-reveal__name">
-        <span className="opening-reveal__star" aria-hidden="true">✦</span>
-        <strong>Golden</strong>
-        <small>Esthetics</small>
-      </div>
-      <p className="opening-reveal__signature">Your skin, but golden.</p>
       {soundBlocked && (
         <p className="opening-reveal__sound-hint" role="status">
           <span aria-hidden="true">♪</span> Tap anywhere for sound

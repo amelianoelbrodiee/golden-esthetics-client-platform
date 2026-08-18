@@ -303,3 +303,9 @@ body{font-family:'Jost',system-ui,sans-serif}
  .mobile-nav.is-hidden{transform:none}
  body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
 }
+
+/* Phones: stack the Find My Facial steps centered (they don't fit on one line) */
+@media(max-width:600px){
+ .mini-steps{flex-direction:column;align-items:center;gap:11px}
+ .mini-steps span:not(:last-child)::after{content:none}
+}

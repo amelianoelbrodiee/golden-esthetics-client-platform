@@ -334,3 +334,16 @@ body{font-family:'Jost',system-ui,sans-serif}
 .portrait-image{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block}
 @media(max-width:800px){.portrait-placeholder{height:360px}}
 @media(max-width:600px){.portrait-placeholder{height:320px}}
+
+/* Admin dashboard: iPhone polish */
+@media(max-width:850px){
+.admin-app{overflow-x:hidden}
+.gallery-manager{grid-template-columns:1fr;gap:22px}
+.admin-columns{grid-template-columns:1fr}
+.panel-heading{flex-wrap:wrap;gap:8px 12px;align-items:flex-start}
+.funnel-list>div{grid-template-columns:90px 1fr 38px}
+.gallery-admin-actions button{flex:1 1 auto;min-height:44px;font-size:11px;padding:11px 12px}
+.lead-table select{min-height:44px}
+.admin-login h1{font-size:40px}
+.admin-login input,.gallery-upload-form input,.gallery-upload-form textarea,.gallery-upload-form select,.access-invite input,.lead-table select{font-size:16px}
+}

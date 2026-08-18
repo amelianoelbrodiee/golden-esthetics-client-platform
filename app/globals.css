@@ -223,3 +223,27 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:120;o
 .dp-5{bottom:7%;right:33%;left:auto;top:auto;width:50px}
 @media(prefers-reduced-motion:no-preference){.df-hero .daisy{animation-name:daisy-bloom-soft}}
 @keyframes daisy-bloom-soft{0%{opacity:0;transform:scale(0) rotate(-45deg)}12%{opacity:.24}40%{opacity:.24;transform:scale(1) rotate(0)}68%{opacity:.24;transform:scale(1) rotate(0)}88%{opacity:0;transform:scale(1.05) rotate(12deg)}100%{opacity:0}}
+/* ===== MOBILE DECLUTTER + BREATHING ROOM (phones first) ===== */
+@media(max-width:800px){
+ /* calmer decor */
+ .c-star-1,.c-star-2,.c-star-3{display:none}
+ .c-star-4{top:12%;left:10%;width:9px}
+ .c-moon{width:24px;top:8%;right:9%;opacity:.7}
+ .dp-3,.dp-4,.dp-5{display:none}
+ .dp-1{width:50px;top:6%;right:6%}
+ .dp-2{width:64px;top:auto;bottom:11%;right:5%}
+ .dp-8{display:none}
+ .dp-6{width:54px}.dp-7{width:68px}
+ body::before{opacity:.03}
+ /* tame oversized headings */
+ .hero h1,.page-hero h1,.placeholder-page h1{font-size:clamp(42px,12.5vw,58px);letter-spacing:-.015em;margin:14px 0}
+ .match-grid h2,.section h2,.about-copy h2,.builder-inner h2,.booking-cta h2{font-size:clamp(32px,8.5vw,44px)}
+ .match-card h3{font-size:29px}
+ .lede{font-size:16px;line-height:1.55}
+ /* breathing room / rhythm */
+ .section{padding-block:64px}
+ .match-section{padding:64px 0}
+ .booking-cta{padding:74px 0}
+ .builder-band{padding:64px 0}
+ .steps-grid article{padding:30px}
+}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-const INTRO_STORAGE_KEY = "golden-esthetics-opening-v5-seen";
+const INTRO_STORAGE_KEY = "golden-esthetics-opening-v6-seen";
 
 const sparkleChimes = [
   [784, 0], [1175, 0.14], [1568, 0.32], [2093, 0.5], [1319, 0.76],
@@ -102,6 +102,7 @@ type ParticleStyle = CSSProperties & {
 export function OpeningReveal() {
   const [isVisible, setIsVisible] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
+  const [soundBlocked, setSoundBlocked] = useState(false);
   const soundPlayed = useRef(false);
 
   useEffect(() => {
@@ -113,7 +114,9 @@ export function OpeningReveal() {
       // The intro still works when storage is unavailable.
     }
 
-    if (window.location.pathname.startsWith("/admin") || hasSeenIntro) {
+    const replayRequested = new URLSearchParams(window.location.search).get("intro") === "replay";
+
+    if (window.location.pathname.startsWith("/admin") || (hasSeenIntro && !replayRequested)) {
       const hideTimer = window.setTimeout(() => setIsVisible(false), 0);
       return () => window.clearTimeout(hideTimer);
     }
@@ -127,13 +130,19 @@ export function OpeningReveal() {
     const removeSoundFallback = () => {
       interactionEvents.forEach((eventName) => window.removeEventListener(eventName, trySound));
     };
-    const trySound = () => {
+    const trySound = (event?: Event) => {
+      if (event?.target instanceof Element && event.target.closest(".opening-reveal__skip")) return;
       if (soundPlayed.current || soundAttempting) return;
       soundAttempting = true;
       void playSparkleSound().then((played) => {
         soundAttempting = false;
-        if (!played) return;
+        if (!played) {
+          setSoundBlocked(true);
+          console.warn("[opening-reveal] Autoplay was blocked; waiting for a visitor interaction.");
+          return;
+        }
         soundPlayed.current = true;
+        setSoundBlocked(false);
         removeSoundFallback();
       });
     };
@@ -202,10 +211,14 @@ export function OpeningReveal() {
         <small>Esthetics</small>
       </div>
       <p className="opening-reveal__signature">Your skin, but golden.</p>
+      {soundBlocked && (
+        <p className="opening-reveal__sound-hint" role="status">
+          <span aria-hidden="true">♪</span> Tap anywhere for sound
+        </p>
+      )}
       <button type="button" className="opening-reveal__skip" onClick={dismiss}>
         Skip intro
       </button>
     </div>
   );
 }
-

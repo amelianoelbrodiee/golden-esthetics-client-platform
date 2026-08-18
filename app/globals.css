@@ -40,3 +40,5 @@ body:has(.admin-app)>.site-header,body:has(.admin-app)>footer,body:has(.admin-ap
 .admin-login-help{display:flex;flex-direction:column;gap:5px;border-left:3px solid #cdb75f;padding:11px 14px;color:#c8cec4;font-size:11px;line-height:1.5}.admin-login-help strong{color:#fff}
 @media(max-width:1100px){.gallery-manager{grid-template-columns:1fr}.gallery-admin-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:850px){.control-map,.content-form,.gallery-upload-form{grid-template-columns:1fr}.content-form label:nth-child(2),.content-form label:nth-child(3),.content-form>button,.content-form>.dashboard-status,.form-wide{grid-column:auto}.gallery-admin-list{grid-template-columns:1fr}.publish-options{flex-direction:column;gap:8px}.control-map article{padding:22px}}
+
+.booking-stack .booking-all{background:#dfcc7d;border-color:#dfcc7d;color:var(--deep);font-weight:700}.booking-or{padding:7px 0 2px;text-align:center;color:#bac0b6;font-size:9px;text-transform:uppercase;letter-spacing:.13em}.booking-help{line-height:1.5}

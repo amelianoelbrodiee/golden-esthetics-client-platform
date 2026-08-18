@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { SiteContent } from "../lib/site-content";
 import { services } from "../data/services";
+import { defaultFaqs } from "../lib/default-faqs";
 
 type Metric = { label: string; value: string; detail: string };
 type Lead = { id: string; name: string; email: string | null; phone: string | null; interest: string | null; message: string; status: string; created_at: string; consultation_summary: unknown };
@@ -118,6 +119,23 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
     const body = await response.json();
     if (response.ok) { setFaqs(value => value.filter(item => item.id !== id)); setFaqStatus("FAQ deleted."); }
     else setFaqStatus(body.error);
+  }
+
+  const [importing, setImporting] = useState(false);
+  async function importDefaultFaqs() {
+    setImporting(true);
+    setFaqStatus("Adding your current FAQs\u2026");
+    const created: Faq[] = [];
+    for (let index = 0; index < defaultFaqs.length; index += 1) {
+      const faq = defaultFaqs[index];
+      const response = await fetch("/api/admin/faqs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: faq.question, answer: faq.answer, sort_order: index + 1, published: true }) });
+      const body = await response.json();
+      if (response.ok) created.push(body.item);
+      else { setFaqStatus(body.error || "Could not import FAQs."); break; }
+    }
+    if (created.length) setFaqs(value => sortFaqs([...value, ...created]));
+    setFaqStatus(created.length ? `Imported ${created.length} FAQ${created.length === 1 ? "" : "s"} \u2014 edit any of them below.` : "Nothing imported.");
+    setImporting(false);
   }
 
   useEffect(() => {
@@ -293,7 +311,7 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
               <button type="button" className="danger-action" onClick={() => deleteFaq(item.id)}>Delete</button>
             </div>
           </form>)}
-        </div> : <p className="admin-empty">No FAQs yet. Add your first question above.</p>}
+        </div> : <div className="admin-empty faq-import"><p>No FAQs saved yet. Import the ones currently on your site so you can edit their wording, then Save each change:</p><button type="button" className="button button-primary" onClick={importDefaultFaqs} disabled={importing}>{importing ? "Importing\u2026" : `Import current FAQs (${defaultFaqs.length})`}</button></div>}
       </section>}
 
       {tab === "Golden List" && <section className="admin-columns newsletter-admin">

@@ -25,4 +25,5 @@ export const services:Service[]=[
  s("microdermabrasion","Microdermabrasion","Add-Ons",45,"An exfoliating add-on for smoother-looking texture when appropriate.",["Texture","Surface exfoliation"]),
 ];
 export const featuredServices=services.filter(x=>x.featured);
+export const browLashServices=["brow-lamination","lash-lift-tint","brow-wax-tint"].map(id=>services.find(x=>x.id===id)!).filter(Boolean);
 export const serviceCategories:ServiceCategory[]=["Facials","Brows","Lashes","Waxing","Add-Ons"];

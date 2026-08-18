@@ -125,3 +125,29 @@ body:has(.admin-app)>.site-header,body:has(.admin-app)>footer,body:has(.admin-ap
 .hv-bloom-center{fill:#b8962f}
 .hv-bud{fill:#cbb05a}
 .gd-bloom-float{width:22px;height:22px;overflow:visible}
+/* --- golden daisies that bloom one at a time --- */
+.daisy-field{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.daisy{position:absolute;width:74px;height:auto;opacity:.3;transform-box:fill-box;transform-origin:center}
+.daisy-petal{fill:#e3cc72}
+.daisy-center{fill:#bd952e}
+.dp-1{top:7%;left:5%;width:66px}
+.dp-2{top:12%;right:7%;width:92px}
+.dp-3{top:46%;left:-1%;width:74px}
+.dp-4{bottom:15%;right:5%;width:84px}
+.dp-5{top:62%;right:24%;width:58px}
+.dp-6{top:10%;left:6%;width:74px}
+.dp-7{bottom:14%;right:7%;width:96px}
+.dp-8{top:42%;right:32%;width:62px}
+@media(prefers-reduced-motion:no-preference){
+ .daisy{opacity:0;animation:daisy-bloom 9s ease-in-out infinite both}
+ .dp-1{animation-delay:0s}.dp-2{animation-delay:1.7s}.dp-3{animation-delay:3.4s}.dp-4{animation-delay:5.1s}.dp-5{animation-delay:6.8s}
+ .dp-6{animation-delay:0s}.dp-7{animation-delay:3s}.dp-8{animation-delay:6s}
+}
+@keyframes daisy-bloom{
+ 0%{opacity:0;transform:scale(0) rotate(-45deg)}
+ 12%{opacity:.38}
+ 38%{opacity:.38;transform:scale(1) rotate(0)}
+ 68%{opacity:.38;transform:scale(1) rotate(0)}
+ 88%{opacity:0;transform:scale(1.06) rotate(12deg)}
+ 100%{opacity:0;transform:scale(1.06) rotate(12deg)}
+}

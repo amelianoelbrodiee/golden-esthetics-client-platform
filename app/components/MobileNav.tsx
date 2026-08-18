@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { business } from "../data/business";
 
 const menu = [
@@ -17,7 +17,16 @@ const menu = [
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
+  const [atFooter, setAtFooter] = useState(false);
   const close = () => setOpen(false);
+  // Tuck the floating bar away once the footer comes into view so it doesn't hover over the end of the page.
+  useEffect(() => {
+    const footer = document.querySelector("footer");
+    if (!footer) return;
+    const io = new IntersectionObserver(([entry]) => setAtFooter(entry.isIntersecting), { rootMargin: "0px 0px -12% 0px" });
+    io.observe(footer);
+    return () => io.disconnect();
+  }, []);
   return <>
     <div className={open ? "mobile-sheet-backdrop open" : "mobile-sheet-backdrop"} onClick={close} aria-hidden="true" />
     <div className={open ? "mobile-sheet open" : "mobile-sheet"} role="dialog" aria-modal="true" aria-label="Site menu" aria-hidden={!open}>
@@ -28,7 +37,7 @@ export function MobileNav() {
       </div>
       <a className="mobile-sheet-book" href={business.squareBookingBaseUrl} target="_blank" rel="noreferrer" onClick={close}>Book now ↗</a>
     </div>
-    <nav className="mobile-nav" aria-label="Mobile navigation">
+    <nav className={atFooter && !open ? "mobile-nav is-hidden" : "mobile-nav"} aria-label="Mobile navigation">
       <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7" /><path d="M6 10v9h12v-9" /></svg><span>Home</span></a>
       <a className="mobile-feature" href="/find-my-facial"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c.6 4 1.4 5.4 6 6-4.6.6-5.4 1.4-6 6-.6-4.6-1.4-5.4-6-6 4.6-.6 5.4-1.4 6-6Z" /></svg><span>Skin Match</span></a>
       <a href={business.squareBookingBaseUrl} target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2" /><path d="M4 9.5h16M9 3v4M15 3v4" /></svg><span>Book</span></a>

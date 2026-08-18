@@ -293,3 +293,5 @@ body{font-family:'Jost',system-ui,sans-serif}
  .trust-row{font-size:9.5px;letter-spacing:.13em}
  .trust-row span{padding:2px 12px}
 }
+
+@media(max-width:800px){.mobile-nav{transition:transform .32s cubic-bezier(.22,1,.36,1)}.mobile-nav.is-hidden{transform:translateY(120%);pointer-events:none}}

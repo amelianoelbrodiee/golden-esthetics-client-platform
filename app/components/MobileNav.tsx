@@ -29,11 +29,10 @@ export function MobileNav() {
       <a className="mobile-sheet-book" href={business.squareBookingBaseUrl} target="_blank" rel="noreferrer" onClick={close}>Book now ↗</a>
     </div>
     <nav className="mobile-nav" aria-label="Mobile navigation">
-      <a href="/">Home</a>
-      <a href="/services">Services</a>
-      <a className="mobile-feature" href="/find-my-facial"><span>✦</span>Skin Match</a>
-      <a href={business.squareBookingBaseUrl} target="_blank" rel="noreferrer">Book</a>
-      <button type="button" className="mobile-more" aria-expanded={open} aria-label="Open site menu" onClick={() => setOpen(v => !v)}><span>{open ? "✕" : "☰"}</span>Menu</button>
+      <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7" /><path d="M6 10v9h12v-9" /></svg><span>Home</span></a>
+      <a className="mobile-feature" href="/find-my-facial"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c.6 4 1.4 5.4 6 6-4.6.6-5.4 1.4-6 6-.6-4.6-1.4-5.4-6-6 4.6-.6 5.4-1.4 6-6Z" /></svg><span>Skin Match</span></a>
+      <a href={business.squareBookingBaseUrl} target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2" /><path d="M4 9.5h16M9 3v4M15 3v4" /></svg><span>Book</span></a>
+      <button type="button" className="mobile-more" aria-expanded={open} aria-label="Open site menu" onClick={() => setOpen(v => !v)}><svg viewBox="0 0 24 24" aria-hidden="true">{open ? <path d="M6 6l12 12M18 6 6 18" /> : <><path d="M4 7h16M4 12h16M4 17h16" /></>}</svg><span>Menu</span></button>
     </nav>
   </>;
 }

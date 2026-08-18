@@ -361,3 +361,14 @@ body{font-family:'Jost',system-ui,sans-serif}
 .faq-item-actions .button{border-color:var(--deep)}
 .faq-item-actions .danger-action{border-color:#d9b6ae;color:#8b3528;background:#fff7f4}
 @media(max-width:850px){.faq-admin-form input,.faq-admin-form textarea,.faq-admin-item input,.faq-admin-item textarea{font-size:16px}.faq-item-actions button{flex:1 1 auto;min-height:44px}}
+
+/* Admin: completed skin-test results list */
+.skin-tests-panel{margin-top:22px}
+.skin-test-list{display:flex;flex-direction:column;margin-top:8px}
+.skin-test-item{border-top:1px solid #e0e3da;padding:16px 0}
+.skin-test-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.skin-test-head strong{font:19px Georgia;color:#202820}
+.skin-test-head small{color:#777;font-size:12px;white-space:nowrap}
+.skin-test-meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin:8px 0;font-size:12px;color:#5f665b;text-transform:capitalize}
+.skin-test-goals{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.skin-test-goals i{font-style:normal;background:#eef1e8;color:#3f4a3d;border:1px solid #d8ddcf;border-radius:99px;padding:5px 11px;font-size:11px;text-transform:capitalize}

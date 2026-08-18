@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { SiteContent } from "../lib/site-content";
+import { services } from "../data/services";
 
 type Metric = { label: string; value: string; detail: string };
 type Lead = { id: string; name: string; email: string | null; phone: string | null; interest: string | null; message: string; status: string; created_at: string; consultation_summary: unknown };
@@ -11,6 +12,7 @@ type GalleryItem = { id: string; category: string; service_performed: string | n
 type NewsletterCampaign = { subject: string; status: string; sent_count: number; failed_count: number; completed_at: string | null };
 type Testimonial = { id: string; client_name: string; service: string | null; rating: number; quote: string; approved: boolean; featured: boolean; created_at: string };
 type Faq = { id: string; question: string; answer: string; sort_order: number; published: boolean; created_at: string };
+type SkinTest = { id: string; goals: string[] | null; skin_type: string | null; sensitivity: string | null; recommended_service_id: string | null; photo_used: boolean; analysis_mode: string | null; created_at: string };
 export type DashboardData = { metrics: Metric[]; funnel: { label: string; value: number; percent: number }[]; leads: Lead[]; recommendations: { name: string; count: number }[]; goals: { name: string; count: number }[]; admins: Admin[]; galleryItems: GalleryItem[]; siteContent: SiteContent; insights: string[]; hasData: boolean; newsletter: { activeSubscribers: number; sendingConfigured: boolean; lastCampaign: NewsletterCampaign | null } };
 
 export function AdminDashboard({ data, user }: { data: DashboardData; user: { displayName: string; email: string; role: string } }) {
@@ -32,6 +34,9 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const [faqsLoaded, setFaqsLoaded] = useState(false);
   const [faqStatus, setFaqStatus] = useState("");
+  const [skinTests, setSkinTests] = useState<SkinTest[]>([]);
+  const [skinTestsLoaded, setSkinTestsLoaded] = useState(false);
+  const [skinTestStatus, setSkinTestStatus] = useState("");
   const tabs = ["Overview", "Content", "Gallery", "Testimonials", "FAQ", "Golden List", "Recommendations", "Leads", "Access"];
 
   useEffect(() => {
@@ -114,6 +119,17 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
     if (response.ok) { setFaqs(value => value.filter(item => item.id !== id)); setFaqStatus("FAQ deleted."); }
     else setFaqStatus(body.error);
   }
+
+  useEffect(() => {
+    if (tab !== "Recommendations" || skinTestsLoaded) return;
+    fetch("/api/admin/consultations")
+      .then(response => response.json())
+      .then(body => setSkinTests(Array.isArray(body.consultations) ? body.consultations : []))
+      .catch(() => setSkinTestStatus("Skin test results could not be loaded."))
+      .finally(() => setSkinTestsLoaded(true));
+  }, [tab, skinTestsLoaded]);
+
+  const serviceName = (id: string | null) => (id ? services.find(s => s.id === id)?.name ?? id : "No match recorded");
 
   useEffect(() => () => {
     if (beforePreview) URL.revokeObjectURL(beforePreview);
@@ -287,6 +303,22 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
       {tab === "Recommendations" && <section className="admin-columns">
         <article className="admin-panel"><p className="eyebrow">Facial matches</p><h2>Recommendation distribution</h2>{data.recommendations.length ? data.recommendations.map(item => <div className="rank-row" key={item.name}><span>{item.name}</span><strong>{item.count}</strong></div>) : <p className="admin-empty">No completed, opted-in consultation summaries yet.</p>}</article>
         <article className="admin-panel"><p className="eyebrow">Client interests</p><h2>Popular skin goals</h2>{data.goals.length ? data.goals.map(item => <div className="rank-row" key={item.name}><span>{item.name}</span><strong>{item.count}</strong></div>) : <p className="admin-empty">Goal trends will appear after clients opt in.</p>}</article>
+      </section>}
+
+      {tab === "Recommendations" && <section className="admin-panel skin-tests-panel">
+        <div className="panel-heading"><div><p className="eyebrow">Completed results</p><h2>Skin test results</h2></div><span>{skinTests.length} completed</span></div>
+        {skinTestStatus && <p className="dashboard-status" role="status">{skinTestStatus}</p>}
+        {!skinTestsLoaded ? <p className="admin-empty">Loading skin test results…</p> : skinTests.length ? <div className="skin-test-list">
+          {skinTests.map(item => <article key={item.id} className="skin-test-item">
+            <div className="skin-test-head"><strong>{serviceName(item.recommended_service_id)}</strong><small>{new Date(item.created_at).toLocaleDateString()} · {new Date(item.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</small></div>
+            <div className="skin-test-meta">
+              {item.skin_type && <span>Skin: {item.skin_type}</span>}
+              {item.sensitivity && <span>Sensitivity: {item.sensitivity}</span>}
+              <span>{item.analysis_mode === "photo" || item.photo_used ? "Quiz + photo" : "Quiz only"}</span>
+            </div>
+            {item.goals && item.goals.length ? <div className="skin-test-goals">{item.goals.map(goal => <i key={goal}>{goal}</i>)}</div> : <p className="admin-empty">No goals selected.</p>}
+          </article>)}
+        </div> : <p className="admin-empty">No completed skin tests yet. Results appear here as clients finish the Sparrow Skin Match quiz.</p>}
       </section>}
 
       {tab === "Leads" && <section className="admin-panel leads-panel"><div className="panel-heading"><div><p className="eyebrow">Client inquiries</p><h2>Lead follow-up</h2></div><span>{leads.length} total</span></div>{leads.length ? <div className="lead-table">{leads.map(lead => <article key={lead.id}><div><strong>{lead.name}</strong><small>{lead.interest || "No interest selected"} · {new Date(lead.created_at).toLocaleDateString()}</small></div><p>{lead.message}</p><div><a href={lead.email ? `mailto:${lead.email}` : `tel:${lead.phone}`}>{lead.email || lead.phone}</a><select aria-label={`Status for ${lead.name}`} value={lead.status} onChange={event => updateLead(lead.id, event.target.value)}>{["New", "Contacted", "Booked", "Closed"].map(status => <option key={status}>{status}</option>)}</select></div></article>)}</div> : <p className="admin-empty">New contact-form inquiries will appear here.</p>}</section>}

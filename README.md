@@ -106,4 +106,3 @@ Recommendations provide cosmetic service guidance, not medical advice. Concernin
 Vercel builds the standard Next.js application. Production configuration is separated from source secrets, and Git integration can create preview deployments for future branches and production deployments from `main`.
 
 See `CONTENT_TODO.md` for policies, service details, location information, and content that still require McKinnley’s approval before a full commercial launch.
-

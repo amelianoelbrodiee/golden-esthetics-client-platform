@@ -1,0 +1,14 @@
+"use client";
+import { useState } from "react";
+import { trackEvent } from "../lib/analytics";
+type Consultation={answers:{goals:string[]};recommendation:{serviceId:string};analysis?:{observations:{description:string}[]}|null};
+export default function ContactForm(){
+ const[status,setStatus]=useState("");const[busy,setBusy]=useState(false);const[hasConsultation]=useState(()=>typeof window!=="undefined"&&Boolean(localStorage.getItem("golden-consultation")));
+ async function submit(formData:FormData){
+  setBusy(true);setStatus("");let consultation:Consultation|null=null;
+  try{consultation=JSON.parse(localStorage.getItem("golden-consultation")||"null")as Consultation|null}catch{consultation=null}
+  const body={name:formData.get("name"),phone:formData.get("phone"),email:formData.get("email"),interest:formData.get("interest"),message:formData.get("message"),helpChoose:formData.get("helpChoose")==="on",includeConsultation:formData.get("includeConsultation")==="on",consultation:consultation?{goals:consultation.answers.goals,recommendation:consultation.recommendation.serviceId,observations:consultation.analysis?.observations.map(x=>x.description)??[]}:null};
+  try{const r=await fetch("/api/contact",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});const data=await r.json();setStatus(data.message||data.error);if(r.ok)trackEvent("contact_form_submitted",{interest:String(body.interest||"not-set"),demo:Boolean(data.demo)})}catch{setStatus("We couldn’t send that message. Please contact McKinnley directly.")}finally{setBusy(false)}
+ }
+ return <form className="contact-form" action={submit}><div className="form-pair"><label>Name<input required name="name" autoComplete="name"/></label><label>Phone<input name="phone" inputMode="tel" autoComplete="tel"/></label></div><label>Email<input name="email" type="email" autoComplete="email"/></label><label>What are you interested in?<select name="interest" defaultValue=""><option value="">Choose one</option><option>Facials</option><option>Brows</option><option>Lashes</option><option>Waxing</option><option>Multiple services</option><option>Not sure</option></select></label><label>Message<textarea required name="message" maxLength={2000}/></label><label className="form-check"><input name="helpChoose" type="checkbox"/>I’d like McKinnley to help me choose a service.</label>{hasConsultation&&<label className="form-check"><input name="includeConsultation" type="checkbox"/>Include my consultation summary—answers, text observations, and recommendation only. My photo is never attached.</label>}<button className="button button-primary" disabled={busy}>{busy?"Sending…":"Send to McKinnley →"}</button>{status&&<p className="form-status" role="status">{status}</p>}<p className="form-fallback">Need a direct option? <a href="mailto:goldenesthetics12@gmail.com">Email McKinnley</a> or call <a href="tel:+18649731585">(864) 973-1585</a>.</p></form>
+}

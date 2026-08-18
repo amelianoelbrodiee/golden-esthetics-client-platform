@@ -1,0 +1,3 @@
+import type { Service } from "../data/services";
+import { TrackedBookingLink } from "./TrackedBookingLink";
+export function ServiceCard({service,index=0}:{service:Service;index?:number}){return <article className="service-card"><div className="service-number">{String(index+1).padStart(2,"0")}</div><div className="service-top"><span>{service.category}</span><strong>{service.priceLabel}</strong></div><h3>{service.name}</h3><p>{service.description}</p><div className="tags">{service.goodFor.slice(0,3).map(x=><span key={x}>{x}</span>)}</div><TrackedBookingLink className="card-link" href={service.bookingUrl} serviceId={service.id}>Book this service ↗</TrackedBookingLink></article>}

@@ -1,0 +1,8 @@
+import test from"node:test";import assert from"node:assert/strict";import{emptyConsultation,generateRecommendation}from"../app/lib/recommendations.ts";
+const answers=(overrides={})=>({...emptyConsultation,skinType:"normal",sensitivity:"not sensitive",products:["none"],...overrides});
+test("dry skin recommends hydration",()=>assert.equal(generateRecommendation(answers({goals:["dryness","hydration"],skinType:"dry"})).serviceId,"hydrating-facial"));
+test("visible redness and high sensitivity prioritizes calming",()=>{const r=generateRecommendation(answers({goals:["visible redness"],skinType:"sensitive",sensitivity:"very sensitive"}));assert.equal(r.serviceId,"calming-facial");assert.deepEqual(r.addOnIds,["cool-globes"]);assert.ok(r.caution)});
+test("breakouts recommend clarifying and scrubber when compatible",()=>{const r=generateRecommendation(answers({goals:["breakouts"],skinType:"oily"}));assert.equal(r.serviceId,"clarifying-facial");assert.ok(r.addOnIds.includes("skin-scrubber"))});
+test("strong products suppress exfoliating add-ons",()=>{const r=generateRecommendation(answers({goals:["breakouts","smoother-looking texture"],products:["prescription retinoid"]}));assert.equal(r.addOnIds.includes("microdermabrasion"),false);assert.equal(r.addOnIds.includes("skin-scrubber"),false)});
+test("uncertain input falls back to customized facial",()=>assert.equal(generateRecommendation(answers({goals:["not sure"],skinType:"not sure",sensitivity:"not sure"})).serviceId,"customized-facial"));
+test("photo warmth can inform a calming recommendation",()=>assert.equal(generateRecommendation(answers({goals:["not sure"]}),["redness"]).serviceId,"calming-facial"));

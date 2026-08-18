@@ -1,0 +1,1 @@
+import type{Metadata}from"next";import ResultsClient from"./ResultsClient";export const metadata:Metadata={title:"Your Golden Match",description:"Your personalized Golden Esthetics facial recommendation."};export default function Page(){return <ResultsClient/>}

@@ -295,3 +295,12 @@ body{font-family:'Jost',system-ui,sans-serif}
 }
 
 @media(max-width:800px){.mobile-nav{transition:transform .32s cubic-bezier(.22,1,.36,1)}.mobile-nav.is-hidden{transform:translateY(120%);pointer-events:none}}
+
+/* Mobile: stop the header, category bar, and bottom nav from sticking/floating while scrolling */
+@media(max-width:800px){
+ .site-header{position:static;top:auto}
+ .category-nav{position:static;top:auto}
+ .mobile-nav{position:static;transform:none;pointer-events:auto}
+ .mobile-nav.is-hidden{transform:none}
+ body{padding-bottom:0}
+}

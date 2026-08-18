@@ -16,7 +16,7 @@ async function getDashboardData(accessToken: string): Promise<DashboardData> {
     const { count } = await db.from("analytics_events").select("*", { count: "exact", head: true }).eq("event_name", name);
     return count ?? 0;
   };
-  const [views, starts, completed, bookingClicks, contactLeads, subscribers, consultations, leads, admins, gallery, settings] = await Promise.all([
+  const [views, starts, completed, bookingClicks, contactLeads, subscribers, consultations, leads, admins, gallery, settings, campaigns] = await Promise.all([
     countEvent("page_view"), countEvent("quiz_started"), countEvent("quiz_completed"), countEvent("booking_clicked"),
     db.from("leads").select("*", { count: "exact", head: true }),
     db.from("newsletter_subscribers").select("*", { count: "exact", head: true }).eq("active", true),
@@ -25,6 +25,7 @@ async function getDashboardData(accessToken: string): Promise<DashboardData> {
     db.from("admin_users").select("id,user_id,email,role,display_name,active").order("role", { ascending: false }),
     db.from("gallery_items").select("id,category,service_performed,caption,service_date,before_image_url,after_image_url,featured,active,photo_consent_confirmed,sort_order,created_at").order("featured", { ascending: false }).order("created_at", { ascending: false }),
     db.from("business_settings").select("key,value").in("key", ["homepage.hero_headline", "homepage.hero_supporting_copy", "homepage.about_copy", "homepage.announcement"]),
+    db.from("newsletter_campaigns").select("subject,status,sent_count,failed_count,completed_at").order("created_at", { ascending: false }).limit(1),
   ]);
   const recCounts = new Map<string, number>();
   const goalCounts = new Map<string, number>();
@@ -53,6 +54,11 @@ async function getDashboardData(accessToken: string): Promise<DashboardData> {
     ],
     leads: leads.data ?? [], recommendations, goals, admins: admins.data ?? [], insights,
     galleryItems: gallery.data ?? [], siteContent: siteContentFromRows(settings.data),
+    newsletter: {
+      activeSubscribers: subscribers.count ?? 0,
+      sendingConfigured: Boolean(process.env.CRON_SECRET && process.env.RESEND_API_KEY && process.env.GOLDEN_LIST_FROM_EMAIL && process.env.SUPABASE_SECRET_KEY),
+      lastCampaign: campaigns.data?.[0] ?? null,
+    },
     hasData: views + starts + completed + bookingClicks + (contactLeads.count ?? 0) > 0,
   };
 }
@@ -64,3 +70,4 @@ export default async function Page() {
   if (!session) return <AdminLogin configured />;
   return <AdminDashboard data={await getDashboardData(session.accessToken)} user={session} />;
 }
+

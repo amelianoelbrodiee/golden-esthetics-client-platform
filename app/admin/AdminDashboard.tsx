@@ -1,14 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SiteContent } from "../lib/site-content";
 
 type Metric = { label: string; value: string; detail: string };
 type Lead = { id: string; name: string; email: string | null; phone: string | null; interest: string | null; message: string; status: string; created_at: string; consultation_summary: unknown };
 type Admin = { id: string; user_id: string | null; email: string; role: string; display_name: string | null; active: boolean };
 type GalleryItem = { id: string; category: string; service_performed: string | null; caption: string | null; service_date: string | null; before_image_url: string | null; after_image_url: string | null; featured: boolean; active: boolean; photo_consent_confirmed: boolean; sort_order: number; created_at: string };
-export type DashboardData = { metrics: Metric[]; funnel: { label: string; value: number; percent: number }[]; leads: Lead[]; recommendations: { name: string; count: number }[]; goals: { name: string; count: number }[]; admins: Admin[]; galleryItems: GalleryItem[]; siteContent: SiteContent; insights: string[]; hasData: boolean };
+type NewsletterCampaign = { subject: string; status: string; sent_count: number; failed_count: number; completed_at: string | null };
+export type DashboardData = { metrics: Metric[]; funnel: { label: string; value: number; percent: number }[]; leads: Lead[]; recommendations: { name: string; count: number }[]; goals: { name: string; count: number }[]; admins: Admin[]; galleryItems: GalleryItem[]; siteContent: SiteContent; insights: string[]; hasData: boolean; newsletter: { activeSubscribers: number; sendingConfigured: boolean; lastCampaign: NewsletterCampaign | null } };
 
 export function AdminDashboard({ data, user }: { data: DashboardData; user: { displayName: string; email: string; role: string } }) {
   const [tab, setTab] = useState("Overview");
@@ -19,8 +20,23 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
   const [accessStatus, setAccessStatus] = useState("");
   const [contentStatus, setContentStatus] = useState("");
   const [galleryStatus, setGalleryStatus] = useState("");
+  const [galleryBusy, setGalleryBusy] = useState(false);
+  const [beforePreview, setBeforePreview] = useState("");
+  const [afterPreview, setAfterPreview] = useState("");
   const galleryForm = useRef<HTMLFormElement>(null);
-  const tabs = ["Overview", "Content", "Gallery", "Recommendations", "Leads", "Access"];
+  const tabs = ["Overview", "Content", "Gallery", "Golden List", "Recommendations", "Leads", "Access"];
+
+  useEffect(() => () => {
+    if (beforePreview) URL.revokeObjectURL(beforePreview);
+  }, [beforePreview]);
+  useEffect(() => () => {
+    if (afterPreview) URL.revokeObjectURL(afterPreview);
+  }, [afterPreview]);
+
+  function previewPhoto(file: File | undefined, side: "before" | "after") {
+    const setter = side === "before" ? setBeforePreview : setAfterPreview;
+    setter(file ? URL.createObjectURL(file) : "");
+  }
 
   async function updateLead(id: string, status: string) {
     const response = await fetch(`/api/admin/leads/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
@@ -38,14 +54,21 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
   }
 
   async function uploadGallery(formData: FormData) {
+    setGalleryBusy(true);
     setGalleryStatus("Uploading securely…");
-    const response = await fetch("/api/admin/gallery", { method: "POST", body: formData });
-    const body = await response.json();
-    if (response.ok) {
-      setGalleryItems(value => [body.item, ...value]);
-      galleryForm.current?.reset();
-      setGalleryStatus(body.item.active ? "Uploaded and published to the gallery." : "Uploaded as an unpublished dashboard draft.");
-    } else setGalleryStatus(body.error);
+    try {
+      const response = await fetch("/api/admin/gallery", { method: "POST", body: formData });
+      const body = await response.json();
+      if (response.ok) {
+        setGalleryItems(value => [body.item, ...value]);
+        galleryForm.current?.reset();
+        setBeforePreview("");
+        setAfterPreview("");
+        setGalleryStatus(body.item.active ? "Uploaded and published to the gallery." : "Uploaded as an unpublished dashboard draft.");
+      } else setGalleryStatus(body.error);
+    } finally {
+      setGalleryBusy(false);
+    }
   }
 
   async function updateGallery(id: string, updates: Partial<Pick<GalleryItem, "active" | "featured">>) {
@@ -118,17 +141,17 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
       {tab === "Gallery" && <section className="gallery-manager">
         <article className="admin-panel">
           <p className="eyebrow">Portfolio upload</p><h2>Add client work</h2>
-          <p>At least one photo is required. Only upload photos the client has explicitly approved for public marketing use.</p>
+          <p>Built for her phone: tap a photo box to take a picture or choose one from the camera roll. At least one photo is required.</p>
           <form ref={galleryForm} action={uploadGallery} className="gallery-upload-form">
             <label>Category<select name="category" required defaultValue="Facials"><option>Facials</option><option>Brows</option><option>Lashes</option><option>Waxing</option><option>Skincare</option></select></label>
             <label>Service performed<input name="servicePerformed" maxLength={120} placeholder="Hydrating Facial"/></label>
-            <label>Before photo<input name="beforeImage" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-            <label>After photo<input name="afterImage" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+            <label className={`photo-picker${beforePreview ? " has-preview" : ""}`}><span>Before photo</span><input name="beforeImage" type="file" accept="image/jpeg,image/png,image/webp" onChange={event => previewPhoto(event.currentTarget.files?.[0], "before")}/><span className="photo-picker-ui">{beforePreview ? <><Image unoptimized src={beforePreview} alt="Selected before photo preview" width={320} height={220}/><b>Tap to replace</b></> : <><b>＋ Add before photo</b><small>Take a photo or choose from camera roll</small></>}</span></label>
+            <label className={`photo-picker${afterPreview ? " has-preview" : ""}`}><span>After photo</span><input name="afterImage" type="file" accept="image/jpeg,image/png,image/webp" onChange={event => previewPhoto(event.currentTarget.files?.[0], "after")}/><span className="photo-picker-ui">{afterPreview ? <><Image unoptimized src={afterPreview} alt="Selected after photo preview" width={320} height={220}/><b>Tap to replace</b></> : <><b>＋ Add after photo</b><small>Take a photo or choose from camera roll</small></>}</span></label>
             <label>Service date<input name="serviceDate" type="date"/></label>
             <label className="form-wide">Caption<textarea name="caption" maxLength={600} placeholder="A short, client-safe description of the result"/></label>
             <label className="check-row form-wide"><input name="photoConsentConfirmed" type="checkbox" value="true" required/> I confirm the client approved these photos for public marketing use.</label>
-            <div className="form-wide publish-options"><label className="check-row"><input name="active" type="checkbox" value="true"/> Publish immediately</label><label className="check-row"><input name="featured" type="checkbox" value="true"/> Feature first</label></div>
-            <button className="button button-primary form-wide">Upload gallery item</button>
+            <div className="form-wide publish-options"><label className="check-row"><input name="active" type="checkbox" value="true" defaultChecked/> Publish immediately</label><label className="check-row"><input name="featured" type="checkbox" value="true"/> Feature first</label></div>
+            <button className="button button-primary form-wide" disabled={galleryBusy}>{galleryBusy ? "Uploading photos…" : "Upload gallery item"}</button>
           </form>
           {galleryStatus && <p className="dashboard-status" role="status">{galleryStatus}</p>}
         </article>
@@ -138,6 +161,11 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
         }) : <div className="admin-panel admin-empty">No portfolio photos have been uploaded yet.</div>}</div>
       </section>}
 
+      {tab === "Golden List" && <section className="admin-columns newsletter-admin">
+        <article className="admin-panel newsletter-schedule-card"><p className="eyebrow">Monthly newsletter</p><h2>The 15th, automatically.</h2><div className="newsletter-date"><strong>15</strong><span>Every month<br/>Morning delivery</span></div><p>A warm, seasonal skincare note is prepared for each month and the Vercel schedule runs at 14:00 UTC—morning in South Carolina.</p><span className={data.newsletter.sendingConfigured ? "setup-ready" : "setup-needed"}>{data.newsletter.sendingConfigured ? "Sending connected" : "Sending address needs connection"}</span></article>
+        <article className="admin-panel"><p className="eyebrow">List health</p><h2>{data.newsletter.activeSubscribers} active subscriber{data.newsletter.activeSubscribers === 1 ? "" : "s"}</h2>{data.newsletter.lastCampaign ? <div className="campaign-summary"><strong>{data.newsletter.lastCampaign.subject}</strong><span>Status: {data.newsletter.lastCampaign.status}</span><span>{data.newsletter.lastCampaign.sent_count} sent · {data.newsletter.lastCampaign.failed_count} failed</span><small>{data.newsletter.lastCampaign.completed_at ? new Date(data.newsletter.lastCampaign.completed_at).toLocaleDateString() : "In progress"}</small></div> : <p className="admin-empty">The first campaign history will appear here after the first scheduled send.</p>}<div className="newsletter-note"><span>✦</span><p>Subscribers can unsubscribe themselves from every email. Their private email addresses stay in Supabase and never appear on the public site.</p></div></article>
+      </section>}
+
       {tab === "Recommendations" && <section className="admin-columns">
         <article className="admin-panel"><p className="eyebrow">Facial matches</p><h2>Recommendation distribution</h2>{data.recommendations.length ? data.recommendations.map(item => <div className="rank-row" key={item.name}><span>{item.name}</span><strong>{item.count}</strong></div>) : <p className="admin-empty">No completed, opted-in consultation summaries yet.</p>}</article>
         <article className="admin-panel"><p className="eyebrow">Client interests</p><h2>Popular skin goals</h2>{data.goals.length ? data.goals.map(item => <div className="rank-row" key={item.name}><span>{item.name}</span><strong>{item.count}</strong></div>) : <p className="admin-empty">Goal trends will appear after clients opt in.</p>}</article>
@@ -145,7 +173,8 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
 
       {tab === "Leads" && <section className="admin-panel leads-panel"><div className="panel-heading"><div><p className="eyebrow">Client inquiries</p><h2>Lead follow-up</h2></div><span>{leads.length} total</span></div>{leads.length ? <div className="lead-table">{leads.map(lead => <article key={lead.id}><div><strong>{lead.name}</strong><small>{lead.interest || "No interest selected"} · {new Date(lead.created_at).toLocaleDateString()}</small></div><p>{lead.message}</p><div><a href={lead.email ? `mailto:${lead.email}` : `tel:${lead.phone}`}>{lead.email || lead.phone}</a><select aria-label={`Status for ${lead.name}`} value={lead.status} onChange={event => updateLead(lead.id, event.target.value)}>{["New", "Contacted", "Booked", "Closed"].map(status => <option key={status}>{status}</option>)}</select></div></article>)}</div> : <p className="admin-empty">New contact-form inquiries will appear here.</p>}</section>}
 
-      {tab === "Access" && <section className="admin-panel"><p className="eyebrow">Private access</p><h2>Owner & administrator</h2><div className="login-guide"><strong>McKinnley’s first login</strong><ol><li>Open <code>/admin</code> and choose “First time? Activate an approved account.”</li><li>Use <code>goldenesthetics12@gmail.com</code>, choose a private password, then confirm the Supabase email.</li><li>Return to <code>/admin</code> and sign in. Her owner account and your Sparrow admin account are the only pre-approved accounts.</li></ol></div><div className="access-list">{admins.map(admin => <article key={admin.id}><span>{(admin.display_name || admin.role).slice(0, 1)}</span><div><strong>{admin.display_name || "Authorized user"}</strong><small>{admin.email} · {admin.role === "owner" ? "Owner · full business authority" : "Admin · Sparrow site operations"}</small></div><i>{admin.user_id ? "Active" : "Invited"}</i></article>)}</div>{user.role === "owner" ? <form action={addAdmin} className="access-invite"><h3>Approve a Sparrow administrator</h3><p>Add the administrator’s email before they activate their account.</p><label>Name<input name="displayName" required/></label><label>Email<input name="email" type="email" required/></label><button className="button button-primary">Approve admin access</button>{accessStatus && <small role="status">{accessStatus}</small>}</form> : <p className="admin-empty">Only the owner can approve future access changes.</p>}</section>}
+      {tab === "Access" && <section className="admin-panel"><p className="eyebrow">Private access</p><h2>Owner & administrator</h2><div className="login-guide"><strong>First login for each of you</strong><ol><li>Open <a href="/admin"><code>golden-esthetics-client-platform.vercel.app/admin</code></a> and choose “First time? Activate an approved account.”</li><li>McKinnley uses <code>goldenesthetics12@gmail.com</code>. You use <code>amelianoelbrodiee@gmail.com</code>. Each person creates her own private password.</li><li>Open the Supabase confirmation email, then return to <code>/admin</code> and sign in.</li></ol><p>McKinnley’s Owner account has full business authority. Your Admin account manages the site without taking ownership away from her.</p></div><div className="access-list">{admins.map(admin => <article key={admin.id}><span>{(admin.display_name || admin.role).slice(0, 1)}</span><div><strong>{admin.display_name || "Authorized user"}</strong><small>{admin.email} · {admin.role === "owner" ? "Owner · full business authority" : "Admin · Sparrow site operations"}</small></div><i>{admin.user_id ? "Active" : "Needs activation"}</i></article>)}</div>{user.role === "owner" ? <form action={addAdmin} className="access-invite"><h3>Approve a Sparrow administrator</h3><p>Add the administrator’s email before they activate their account.</p><label>Name<input name="displayName" required/></label><label>Email<input name="email" type="email" required/></label><button className="button button-primary">Approve admin access</button>{accessStatus && <small role="status">{accessStatus}</small>}</form> : <p className="admin-empty">Only the owner can approve future access changes.</p>}</section>}
     </main>
   </div>;
 }
+

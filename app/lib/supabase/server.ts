@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 let publicClient: SupabaseClient | null | undefined;
+let adminClient: SupabaseClient | null | undefined;
 
 function getConfig() {
   return {
@@ -38,3 +39,16 @@ export function getSupabaseUserClient(accessToken: string) {
     },
   });
 }
+
+export function getSupabaseAdminClient() {
+  if (adminClient !== undefined) return adminClient;
+  const { url } = getConfig();
+  const secretKey = process.env.SUPABASE_SECRET_KEY;
+  if (!url || !secretKey) return (adminClient = null);
+  adminClient = createClient(url, secretKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { headers: { "X-Client-Info": "golden-esthetics-newsletter" } },
+  });
+  return adminClient;
+}
+

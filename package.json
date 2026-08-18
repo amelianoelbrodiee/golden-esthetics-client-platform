@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --experimental-strip-types --test tests/appointment-builder.test.ts tests/image-validation.test.ts tests/recommendations.test.ts tests/screening.test.ts",
+    "test": "node --experimental-strip-types --test tests/appointment-builder.test.ts tests/image-validation.test.ts tests/newsletter.test.ts tests/recommendations.test.ts tests/screening.test.ts",
     "lint": "eslint . --ignore-pattern .next"
   },
   "dependencies": {
@@ -36,3 +36,4 @@
   },
   "type": "module"
 }
+

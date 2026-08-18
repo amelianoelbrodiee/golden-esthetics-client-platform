@@ -257,3 +257,6 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:120;o
  /* let the monogram breathe instead of jamming the seam */
  .about-preview .about-art{min-height:340px}
 }
+/* eyebrows on colored bands were grey-on-color (unreadable) */
+.builder-band .eyebrow{color:rgba(245,237,216,.92)}
+.match-section .eyebrow{color:#2c3b25}

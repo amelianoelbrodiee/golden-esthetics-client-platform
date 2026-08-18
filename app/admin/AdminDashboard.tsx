@@ -12,7 +12,7 @@ type GalleryItem = { id: string; category: string; service_performed: string | n
 type NewsletterCampaign = { subject: string; status: string; sent_count: number; failed_count: number; completed_at: string | null };
 type Testimonial = { id: string; client_name: string; service: string | null; rating: number; quote: string; approved: boolean; featured: boolean; created_at: string };
 type Faq = { id: string; question: string; answer: string; sort_order: number; published: boolean; created_at: string };
-type SkinTest = { id: string; goals: string[] | null; skin_type: string | null; sensitivity: string | null; recommended_service_id: string | null; photo_used: boolean; analysis_mode: string | null; created_at: string };
+type SkinTest = { id: string; name: string | null; goals: string[] | null; skin_type: string | null; sensitivity: string | null; recommended_service_id: string | null; photo_used: boolean; analysis_mode: string | null; created_at: string };
 export type DashboardData = { metrics: Metric[]; funnel: { label: string; value: number; percent: number }[]; leads: Lead[]; recommendations: { name: string; count: number }[]; goals: { name: string; count: number }[]; admins: Admin[]; galleryItems: GalleryItem[]; siteContent: SiteContent; insights: string[]; hasData: boolean; newsletter: { activeSubscribers: number; sendingConfigured: boolean; lastCampaign: NewsletterCampaign | null } };
 
 export function AdminDashboard({ data, user }: { data: DashboardData; user: { displayName: string; email: string; role: string } }) {
@@ -310,7 +310,7 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
         {skinTestStatus && <p className="dashboard-status" role="status">{skinTestStatus}</p>}
         {!skinTestsLoaded ? <p className="admin-empty">Loading skin test results…</p> : skinTests.length ? <div className="skin-test-list">
           {skinTests.map(item => <article key={item.id} className="skin-test-item">
-            <div className="skin-test-head"><strong>{serviceName(item.recommended_service_id)}</strong><small>{new Date(item.created_at).toLocaleDateString()} · {new Date(item.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</small></div>
+            <div className="skin-test-head"><strong>{item.name ? item.name : "Anonymous"}<em>{serviceName(item.recommended_service_id)}</em></strong><small>{new Date(item.created_at).toLocaleDateString()} · {new Date(item.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</small></div>
             <div className="skin-test-meta">
               {item.skin_type && <span>Skin: {item.skin_type}</span>}
               {item.sensitivity && <span>Sensitivity: {item.sensitivity}</span>}

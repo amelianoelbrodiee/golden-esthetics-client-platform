@@ -372,3 +372,8 @@ body{font-family:'Jost',system-ui,sans-serif}
 .skin-test-meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin:8px 0;font-size:12px;color:#5f665b;text-transform:capitalize}
 .skin-test-goals{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
 .skin-test-goals i{font-style:normal;background:#eef1e8;color:#3f4a3d;border:1px solid #d8ddcf;border-radius:99px;padding:5px 11px;font-size:11px;text-transform:capitalize}
+
+/* Skin-test result: name + matched service; quiz name field */
+.skin-test-head strong{display:flex;flex-direction:column;gap:2px;font:19px Georgia;color:#202820}
+.skin-test-head strong em{font:italic 13px Georgia;color:var(--gold)}
+.field-label input{padding:15px;border:1px solid var(--line);background:#faf7ef;font:16px/1.5 Arial}

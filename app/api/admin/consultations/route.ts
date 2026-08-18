@@ -8,7 +8,7 @@ export async function GET() {
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { data, error } = await getSupabaseUserClient(session.accessToken)!
     .from("consultations")
-    .select("id,goals,skin_type,sensitivity,recommended_service_id,photo_used,analysis_mode,created_at")
+    .select("*")
     .order("created_at", { ascending: false })
     .limit(300);
   if (error) return Response.json({ error: "Skin test results could not be loaded" }, { status: 500 });

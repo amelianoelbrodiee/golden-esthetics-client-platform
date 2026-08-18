@@ -35,6 +35,6 @@ export default async function Home() {
     <Testimonials/>
     <section className="section shell insta-follow"><p className="eyebrow">Follow along</p><h2>See the latest <em>glow.</em></h2><p>New work, fresh openings, and skincare tips — all over on Instagram.</p><a className="button button-primary" href={business.instagramUrl} target="_blank" rel="noreferrer">{business.instagram} ↗</a></section>
     <GoldenList/>
-    <section className="booking-cta"><DaisyField variant="cta" /><div className="shell"><Laurel className="laurel-cta" /><p className="eyebrow">Your glow is waiting</p><h2>Ready when you are.</h2><p>Choose your service and book directly with Golden Esthetics.</p><a className="button button-primary" href="https://golden-esthetics-101699.square.site/" target="_blank" rel="noreferrer">Book an Appointment ↗</a> <a className="button button-quiet" href={business.giftCardUrl} target="_blank" rel="noreferrer">Gift Cards ↗</a></div></section>
+    <section className="booking-cta"><DaisyField variant="cta" /><div className="shell"><Laurel className="laurel-cta" /><p className="eyebrow">Your glow is waiting</p><h2>Ready when you are.</h2><p>Choose your service and book directly with Golden Esthetics.</p><a className="button button-primary" href="https://golden-esthetics-101699.square.site/" target="_blank" rel="noreferrer">Book an Appointment ↗</a></div></section>
   </>;
 }

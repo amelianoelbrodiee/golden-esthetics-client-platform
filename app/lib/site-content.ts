@@ -11,7 +11,7 @@ export const defaultSiteContent: SiteContent = {
   heroHeadline: "Your skin, but golden.",
   heroSupportingCopy: "Personalized skincare, brows, lashes & waxing by licensed esthetician McKinnley Golden.",
   aboutCopy: "I’m here to make skincare and beauty services feel personal, comfortable, and easy to understand. We’ll focus on your goals and build an experience that feels entirely your own.",
-  announcement: "",
+  announcement: "Now booking in Seneca, SC · Students save 15% with a valid ID",
 };
 
 const keyMap: Record<string, keyof SiteContent> = {

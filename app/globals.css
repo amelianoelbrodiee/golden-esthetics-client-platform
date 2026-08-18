@@ -309,3 +309,9 @@ body{font-family:'Jost',system-ui,sans-serif}
  .mini-steps{flex-direction:column;align-items:center;gap:11px}
  .mini-steps span:not(:last-child)::after{content:none}
 }
+
+/* Follow-along IG section + gift-card CTA spacing */
+.insta-follow{text-align:center}
+.insta-follow .button{margin-top:10px}
+.booking-cta .button+.button{margin-left:10px}
+@media(max-width:600px){.booking-cta .button{display:flex;margin:10px auto 0}.booking-cta .button+.button{margin-left:auto}}

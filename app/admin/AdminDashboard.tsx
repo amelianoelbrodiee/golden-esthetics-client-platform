@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { SiteContent } from "../lib/site-content";
 
 type Metric = { label: string; value: string; detail: string };
@@ -10,6 +10,7 @@ type Admin = { id: string; user_id: string | null; email: string; role: string; 
 type GalleryItem = { id: string; category: string; service_performed: string | null; caption: string | null; service_date: string | null; before_image_url: string | null; after_image_url: string | null; featured: boolean; active: boolean; photo_consent_confirmed: boolean; sort_order: number; created_at: string };
 type NewsletterCampaign = { subject: string; status: string; sent_count: number; failed_count: number; completed_at: string | null };
 type Testimonial = { id: string; client_name: string; service: string | null; rating: number; quote: string; approved: boolean; featured: boolean; created_at: string };
+type Faq = { id: string; question: string; answer: string; sort_order: number; published: boolean; created_at: string };
 export type DashboardData = { metrics: Metric[]; funnel: { label: string; value: number; percent: number }[]; leads: Lead[]; recommendations: { name: string; count: number }[]; goals: { name: string; count: number }[]; admins: Admin[]; galleryItems: GalleryItem[]; siteContent: SiteContent; insights: string[]; hasData: boolean; newsletter: { activeSubscribers: number; sendingConfigured: boolean; lastCampaign: NewsletterCampaign | null } };
 
 export function AdminDashboard({ data, user }: { data: DashboardData; user: { displayName: string; email: string; role: string } }) {
@@ -28,7 +29,10 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [testimonialsLoaded, setTestimonialsLoaded] = useState(false);
   const [testimonialStatus, setTestimonialStatus] = useState("");
-  const tabs = ["Overview", "Content", "Gallery", "Testimonials", "Golden List", "Recommendations", "Leads", "Access"];
+  const [faqs, setFaqs] = useState<Faq[]>([]);
+  const [faqsLoaded, setFaqsLoaded] = useState(false);
+  const [faqStatus, setFaqStatus] = useState("");
+  const tabs = ["Overview", "Content", "Gallery", "Testimonials", "FAQ", "Golden List", "Recommendations", "Leads", "Access"];
 
   useEffect(() => {
     if (tab !== "Testimonials" || testimonialsLoaded) return;
@@ -58,6 +62,57 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
       setTestimonials(value => value.filter(item => item.id !== id));
       setTestimonialStatus("Review deleted.");
     } else setTestimonialStatus(body.error);
+  }
+
+  useEffect(() => {
+    if (tab !== "FAQ" || faqsLoaded) return;
+    fetch("/api/admin/faqs")
+      .then(response => response.json())
+      .then(body => setFaqs(Array.isArray(body.faqs) ? body.faqs : []))
+      .catch(() => setFaqStatus("FAQs could not be loaded."))
+      .finally(() => setFaqsLoaded(true));
+  }, [tab, faqsLoaded]);
+
+  const sortFaqs = (list: Faq[]) => [...list].sort((a, b) => a.sort_order - b.sort_order || a.created_at.localeCompare(b.created_at));
+
+  async function createFaq(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const fd = new FormData(form);
+    setFaqStatus("Adding\u2026");
+    const payload = { question: fd.get("question"), answer: fd.get("answer"), sort_order: Number(fd.get("sort_order")) || 0, published: fd.get("published") === "on" };
+    const response = await fetch("/api/admin/faqs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    const body = await response.json();
+    if (response.ok) { setFaqs(value => sortFaqs([...value, body.item])); form.reset(); setFaqStatus("Question added and live on the site."); }
+    else setFaqStatus(body.error);
+  }
+
+  async function saveFaq(event: FormEvent<HTMLFormElement>, id: string) {
+    event.preventDefault();
+    const fd = new FormData(event.currentTarget);
+    setFaqStatus("Saving\u2026");
+    const payload = { question: fd.get("question"), answer: fd.get("answer"), sort_order: Number(fd.get("sort_order")) || 0 };
+    const response = await fetch(`/api/admin/faqs/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    const body = await response.json();
+    if (response.ok) { setFaqs(value => sortFaqs(value.map(item => item.id === id ? body.item : item))); setFaqStatus("Saved. Live on the site."); }
+    else setFaqStatus(body.error);
+  }
+
+  async function toggleFaq(id: string, published: boolean) {
+    setFaqStatus("Updating\u2026");
+    const response = await fetch(`/api/admin/faqs/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ published }) });
+    const body = await response.json();
+    if (response.ok) { setFaqs(value => value.map(item => item.id === id ? body.item : item)); setFaqStatus(published ? "Now showing on the site." : "Hidden from the site."); }
+    else setFaqStatus(body.error);
+  }
+
+  async function deleteFaq(id: string) {
+    if (!window.confirm("Delete this FAQ permanently? This cannot be undone.")) return;
+    setFaqStatus("Deleting\u2026");
+    const response = await fetch(`/api/admin/faqs/${id}`, { method: "DELETE" });
+    const body = await response.json();
+    if (response.ok) { setFaqs(value => value.filter(item => item.id !== id)); setFaqStatus("FAQ deleted."); }
+    else setFaqStatus(body.error);
   }
 
   useEffect(() => () => {
@@ -196,6 +251,33 @@ export function AdminDashboard({ data, user }: { data: DashboardData; user: { di
       </section>}
 
       {tab === "Testimonials" && <section className="admin-panel leads-panel"><div className="panel-heading"><div><p className="eyebrow">Client reviews</p><h2>Approve what shows on the site</h2></div><span>{testimonials.filter(item => !item.approved).length} awaiting review</span></div>{testimonialStatus && <p className="dashboard-status" role="status">{testimonialStatus}</p>}{!testimonialsLoaded ? <p className="admin-empty">Loading reviews…</p> : testimonials.length ? <div className="lead-table">{testimonials.map(item => <article key={item.id}><div><strong>{item.client_name} · {"✦".repeat(item.rating)}</strong><small>{item.service || "No service noted"} · {new Date(item.created_at).toLocaleDateString()} · {item.approved ? "Published" : "Pending"}{item.featured ? " · Featured" : ""}</small></div><p>“{item.quote}”</p><div className="gallery-admin-actions"><button onClick={() => moderateTestimonial(item.id, { approved: !item.approved })}>{item.approved ? "Unpublish" : "Approve & publish"}</button><button onClick={() => moderateTestimonial(item.id, { featured: !item.featured })}>{item.featured ? "Unfeature" : "Feature"}</button><button className="danger-action" onClick={() => deleteTestimonial(item.id)}>Delete</button></div></article>)}</div> : <p className="admin-empty">No client reviews have been submitted yet.</p>}</section>}
+
+      {tab === "FAQ" && <section className="admin-panel">
+        <div className="panel-heading"><div><p className="eyebrow">Frequently asked questions</p><h2>Answer &amp; manage FAQs</h2></div><span>{faqs.length} question{faqs.length === 1 ? "" : "s"}</span></div>
+        {faqStatus && <p className="dashboard-status" role="status">{faqStatus}</p>}
+        <form className="faq-admin-form" onSubmit={createFaq}>
+          <label>New question<input name="question" required placeholder="e.g. Do you offer gift cards?" /></label>
+          <label>Answer<textarea name="answer" required placeholder="Write McKinnley’s answer…" /></label>
+          <div className="faq-form-row">
+            <label className="faq-order">Order<input name="sort_order" type="number" defaultValue={(faqs[faqs.length - 1]?.sort_order ?? faqs.length) + 1} /></label>
+            <label className="check-row"><input type="checkbox" name="published" defaultChecked /> Show on site</label>
+            <button className="button button-primary" type="submit">Add question</button>
+          </div>
+        </form>
+        {!faqsLoaded ? <p className="admin-empty">Loading FAQs…</p> : faqs.length ? <div className="faq-admin-list">
+          {faqs.map(item => <form key={item.id} className="faq-admin-item" onSubmit={event => saveFaq(event, item.id)}>
+            <label>Question<input name="question" defaultValue={item.question} required /></label>
+            <label>Answer<textarea name="answer" defaultValue={item.answer} required /></label>
+            <div className="faq-item-actions">
+              <label className="faq-order">Order<input name="sort_order" type="number" defaultValue={item.sort_order} /></label>
+              <span className={item.published ? "setup-ready" : "setup-needed"}>{item.published ? "On site" : "Hidden"}</span>
+              <button className="button button-quiet" type="submit">Save</button>
+              <button type="button" onClick={() => toggleFaq(item.id, !item.published)}>{item.published ? "Hide" : "Publish"}</button>
+              <button type="button" className="danger-action" onClick={() => deleteFaq(item.id)}>Delete</button>
+            </div>
+          </form>)}
+        </div> : <p className="admin-empty">No FAQs yet. Add your first question above.</p>}
+      </section>}
 
       {tab === "Golden List" && <section className="admin-columns newsletter-admin">
         <article className="admin-panel newsletter-schedule-card"><p className="eyebrow">Monthly newsletter</p><h2>The 15th, automatically.</h2><div className="newsletter-date"><strong>15</strong><span>Every month<br/>Morning delivery</span></div><p>A warm, seasonal skincare note is prepared for each month and the Vercel schedule runs at 14:00 UTC—morning in South Carolina.</p><span className={data.newsletter.sendingConfigured ? "setup-ready" : "setup-needed"}>{data.newsletter.sendingConfigured ? "Sending connected" : "Sending address needs connection"}</span></article>

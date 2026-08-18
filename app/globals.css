@@ -337,7 +337,6 @@ body{font-family:'Jost',system-ui,sans-serif}
 
 /* Admin dashboard: iPhone polish */
 @media(max-width:850px){
-.admin-app{overflow-x:hidden}
 .gallery-manager{grid-template-columns:1fr;gap:22px}
 .admin-columns{grid-template-columns:1fr}
 .panel-heading{flex-wrap:wrap;gap:8px 12px;align-items:flex-start}

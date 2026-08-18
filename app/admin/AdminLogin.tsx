@@ -46,6 +46,10 @@ export function AdminLogin({ configured }: { configured: boolean }) {
       <button className="admin-mode-toggle" type="button" onClick={() => { setMode(mode === "signin" ? "activate" : "signin"); setError(""); }}>
         {mode === "signin" ? "First time? Activate an approved account" : "Already activated? Sign in"}
       </button>
+      <div className="admin-login-roles">
+        <div><strong>McKinnley · Owner</strong><span>Insights, leads, website content, gallery, and access approvals.</span></div>
+        <div><strong>Sparrow · Admin</strong><span>Insights, leads, website content, and gallery management.</span></div>
+      </div>
       <div className="admin-login-help"><strong>Looking for appointments?</strong><span>Bookings, availability, rescheduling, and payments stay in McKinnley’s Square Dashboard. This login edits the Golden Esthetics website.</span></div>
       <a href="/">← Back to Golden Esthetics</a>
     </form>

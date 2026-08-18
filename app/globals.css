@@ -247,3 +247,5 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:120;o
  .builder-band{padding:64px 0}
  .steps-grid article{padding:30px}
 }
+/* header should scroll away, not follow down the page (bottom nav handles persistent nav on mobile) */
+.site-header{position:relative;top:auto}

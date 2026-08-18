@@ -10,7 +10,7 @@ function splitHeadline(headline: string) {
   if (comma === -1) return { first: headline, second: "" };
   return { first: headline.slice(0, comma + 1), second: headline.slice(comma + 1).trim() };
 }
-
+ 
 export default async function Home() {
   const content = await getPublicSiteContent();
   const headline = splitHeadline(content.heroHeadline);

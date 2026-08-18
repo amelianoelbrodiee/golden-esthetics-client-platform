@@ -2,13 +2,20 @@
 // Pure SVG + CSS (no JS/libs). aria-hidden + pointer-events:none, semi-transparent
 // so text stays readable. Bloom motion gated behind prefers-reduced-motion.
 
-const petals = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
+const lilyPetals = [0, 60, 120, 180, 240, 300];
+const lilyStamens = [30, 90, 150, 210, 270, 330];
 
 function Daisy({ className }: { className: string }) {
   return (
-    <svg className={`daisy ${className}`} viewBox="-30 -30 60 60" aria-hidden="true">
-      {petals.map(a => <ellipse key={a} className="daisy-petal" cx="0" cy="-17" rx="4.3" ry="12" transform={`rotate(${a})`} />)}
-      <circle className="daisy-center" r="6.8" />
+    <svg className={`daisy ${className}`} viewBox="-40 -40 80 80" aria-hidden="true">
+      {lilyPetals.map(a => <path key={a} className="lily-petal" d="M0 0C-5.5 -15 -4.5 -28 0 -35C4.5 -28 5.5 -15 0 0Z" transform={`rotate(${a})`} />)}
+      {lilyStamens.map(a => (
+        <g key={`s${a}`} transform={`rotate(${a})`}>
+          <line className="lily-filament" x1="0" y1="0" x2="0" y2="-13" />
+          <ellipse className="lily-anther" cx="0" cy="-14" rx="1.5" ry="2.6" />
+        </g>
+      ))}
+      <circle className="lily-center" r="2.4" />
     </svg>
   );
 }

@@ -101,3 +101,21 @@ body:has(.admin-app)>.site-header,body:has(.admin-app)>footer,body:has(.admin-ap
 .mobile-feature{background:none;height:auto;margin:0;border-radius:0;color:#9c790d}
 .mobile-feature svg{fill:#e7c765;stroke:#b89838}
 .mobile-feature span{color:#9c790d;font-size:9px}
+/* --- luxe monogram seal (about-art) --- */
+.about-art{overflow:hidden}
+.about-art::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(72%,360px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(199,180,107,.32),transparent 66%)}
+.about-art::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(58%,290px);aspect-ratio:1;border:1px solid rgba(199,180,107,.4);border-radius:50%;box-shadow:inset 0 0 0 7px rgba(199,180,107,.07)}
+.ge-mono{position:relative;z-index:1;background:linear-gradient(135deg,#d9c37a 0%,#f2e6ad 42%,#c3a750 58%,#e7d290 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ge-spark{position:absolute;z-index:1;color:#ecd792;filter:drop-shadow(0 0 6px rgba(230,210,130,.5))}
+.ge-spark-1{font-size:48px;right:18%;top:20%}.ge-spark-2{font-size:22px;left:20%;top:32%}.ge-spark-3{font-size:16px;right:27%;bottom:24%}
+/* --- shiny metallic gold builder band --- */
+.builder-band{position:relative;overflow:hidden;background:linear-gradient(135deg,#6d5717 0%,#9c7d2b 38%,#b8962f 52%,#856b20 100%)}
+.builder-inner{position:relative;z-index:1}
+.builder-band::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.22) 50%,transparent 58%);transform:translateX(-120%)}
+@media(prefers-reduced-motion:no-preference){
+ .builder-band::after{animation:gd-sheen 7.5s ease-in-out infinite}
+ .ge-spark{animation:gd-twinkle 3.4s ease-in-out infinite}.ge-spark-2{animation-delay:-1.2s}.ge-spark-3{animation-delay:-2.2s}
+ .about-art::before{animation:gd-glow 6s ease-in-out infinite}
+}
+@keyframes gd-sheen{0%{transform:translateX(-120%)}60%,100%{transform:translateX(120%)}}
+@keyframes gd-twinkle{0%,100%{opacity:.5;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}

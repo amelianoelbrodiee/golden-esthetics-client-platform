@@ -22,10 +22,21 @@ export default function ResultsClient() {
   const service = services.find(x => x.id === data.recommendation.serviceId)!;
   const addOns = services.filter(x => data.recommendation.addOnIds.includes(x.id));
   const goldenRoutine = generateRoutineSuggestion(data.answers);
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  const known = (v: string) => Boolean(v) && v !== "not sure";
+  const focusGoals = data.answers.goals.filter(g => g !== "not sure").slice(0, 4);
   const snapshots = [
-    { title: "Skin behavior", text: `You described your skin as ${data.answers.skinType}.` },
-    { title: "Sensitivity", text: `You reported that your skin is ${data.answers.sensitivity}.` },
-    { title: "Your goals", text: data.answers.goals.slice(0, 4).join(", ") },
+    { title: "Your skin type", text: known(data.answers.skinType)
+        ? `You described your skin as ${data.answers.skinType}.`
+        : "You\u2019re still getting to know your skin type \u2014 McKinnley can help you pin it down." },
+    { title: "Sensitivity", text: !known(data.answers.sensitivity)
+        ? "You\u2019re not sure how sensitive your skin is \u2014 McKinnley will keep things gentle to start."
+        : data.answers.sensitivity === "not sensitive"
+          ? "Your skin isn\u2019t especially sensitive."
+          : `Your skin is ${data.answers.sensitivity}.` },
+    { title: "What you\u2019re working on", text: focusGoals.length
+        ? focusGoals.map(cap).join(", ")
+        : "You\u2019re open to McKinnley\u2019s expert recommendation." },
   ];
   return <>
     <section className="results-hero"><div className="shell"><p className="eyebrow">Sparrow Skin Match · your personalized result</p><h1>Your Golden Match <span>✦</span></h1><p>Based on your quiz and optional on-device photo cues—not a medical scan or diagnosis.</p></div></section>

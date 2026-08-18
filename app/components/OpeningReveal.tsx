@@ -2,78 +2,79 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-const INTRO_STORAGE_KEY = "golden-esthetics-opening-v4-seen";
+const INTRO_STORAGE_KEY = "golden-esthetics-opening-v5-seen";
+
+const sparkleChimes = [
+  [784, 0], [1175, 0.14], [1568, 0.32], [2093, 0.5], [1319, 0.76],
+  [1760, 1.02], [2349, 1.3], [1568, 1.62], [2637, 1.94], [2093, 2.28],
+] as const;
+
+function createSparkleWavUrl() {
+  const sampleRate = 22050;
+  const duration = 3.8;
+  const samples = Math.floor(sampleRate * duration);
+  const buffer = new ArrayBuffer(44 + samples * 2);
+  const view = new DataView(buffer);
+  const writeAscii = (offset: number, value: string) => {
+    for (let index = 0; index < value.length; index += 1) view.setUint8(offset + index, value.charCodeAt(index));
+  };
+
+  writeAscii(0, "RIFF");
+  view.setUint32(4, 36 + samples * 2, true);
+  writeAscii(8, "WAVE");
+  writeAscii(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeAscii(36, "data");
+  view.setUint32(40, samples * 2, true);
+
+  for (let index = 0; index < samples; index += 1) {
+    const time = index / sampleRate;
+    const masterEnvelope = Math.min(1, time / 0.06) * Math.min(1, Math.max(0, (duration - time) / 0.7));
+    const swellEnvelope = Math.sin(Math.PI * Math.min(time / duration, 1));
+    let sample = 0.14 * Math.sin(2 * Math.PI * (330 * time + 42 * time * time)) * swellEnvelope;
+
+    for (const [frequency, start] of sparkleChimes) {
+      const localTime = time - start;
+      if (localTime < 0 || localTime > 0.72) continue;
+      const attack = Math.min(1, localTime / 0.012);
+      const decay = Math.exp(-localTime * 5.8);
+      const chime = Math.sin(2 * Math.PI * frequency * localTime)
+        + 0.46 * Math.sin(2 * Math.PI * frequency * 1.5 * localTime)
+        + 0.22 * Math.sin(2 * Math.PI * frequency * 2.02 * localTime);
+      sample += chime * attack * decay * 0.28;
+    }
+
+    const shimmer = (Math.random() * 2 - 1) * 0.025 * Math.exp(-Math.max(0, time - 0.15) * 0.7);
+    const shaped = Math.tanh((sample + shimmer) * 1.45) * masterEnvelope * 0.92;
+    view.setInt16(44 + index * 2, Math.round(shaped * 32767), true);
+  }
+
+  return URL.createObjectURL(new Blob([buffer], { type: "audio/wav" }));
+}
 
 async function playSparkleSound(): Promise<boolean> {
-  const AudioContextConstructor = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!AudioContextConstructor) return false;
-  const context = new AudioContextConstructor();
+  const soundUrl = createSparkleWavUrl();
+  const audio = new Audio(soundUrl);
+  audio.autoplay = true;
+  audio.preload = "auto";
+  audio.volume = 1;
+  const cleanup = () => URL.revokeObjectURL(soundUrl);
+  audio.addEventListener("ended", cleanup, { once: true });
+  audio.addEventListener("error", cleanup, { once: true });
   try {
-    await context.resume();
+    await audio.play();
+    window.setTimeout(cleanup, 4500);
+    return true;
   } catch {
-    await context.close().catch(() => undefined);
+    cleanup();
     return false;
   }
-  if (context.state !== "running") {
-    await context.close().catch(() => undefined);
-    return false;
-  }
-
-  const master = context.createGain();
-  const compressor = context.createDynamicsCompressor();
-  master.gain.setValueAtTime(0.72, context.currentTime);
-  compressor.threshold.setValueAtTime(-24, context.currentTime);
-  compressor.ratio.setValueAtTime(4, context.currentTime);
-  master.connect(compressor);
-  compressor.connect(context.destination);
-
-  const shimmerLength = Math.floor(context.sampleRate * 3.4);
-  const shimmerBuffer = context.createBuffer(1, shimmerLength, context.sampleRate);
-  const shimmerData = shimmerBuffer.getChannelData(0);
-  for (let index = 0; index < shimmerData.length; index += 1) {
-    shimmerData[index] = (Math.random() * 2 - 1) * (1 - index / shimmerData.length);
-  }
-  const shimmer = context.createBufferSource();
-  const shimmerFilter = context.createBiquadFilter();
-  const shimmerGain = context.createGain();
-  shimmer.buffer = shimmerBuffer;
-  shimmerFilter.type = "highpass";
-  shimmerFilter.frequency.setValueAtTime(5200, context.currentTime);
-  shimmerGain.gain.setValueAtTime(0.0001, context.currentTime);
-  shimmerGain.gain.exponentialRampToValueAtTime(0.025, context.currentTime + 0.12);
-  shimmerGain.gain.exponentialRampToValueAtTime(0.009, context.currentTime + 1.9);
-  shimmerGain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 3.35);
-  shimmer.connect(shimmerFilter);
-  shimmerFilter.connect(shimmerGain);
-  shimmerGain.connect(master);
-  shimmer.start();
-
-  const sparkles = [
-    [1760, 0.02, -0.65], [2637, 0.1, 0.45], [2093, 0.2, -0.2], [3520, 0.29, 0.7],
-    [2349, 0.43, -0.5], [4186, 0.56, 0.25], [3136, 0.72, 0.58], [4699, 0.9, -0.72],
-    [2794, 1.08, 0.1], [3951, 1.3, 0.62], [5274, 1.55, -0.42], [3520, 1.82, 0.28],
-  ] as const;
-  sparkles.forEach(([frequency, offset, pan], index) => {
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const stereo = context.createStereoPanner();
-    const start = context.currentTime + offset;
-    const decay = 0.34 + (index % 4) * 0.08;
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(frequency, start);
-    oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.035, start + decay);
-    stereo.pan.setValueAtTime(pan, start);
-    gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.exponentialRampToValueAtTime(0.045 + (index % 3) * 0.008, start + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + decay);
-    oscillator.connect(gain);
-    gain.connect(stereo);
-    stereo.connect(master);
-    oscillator.start(start);
-    oscillator.stop(start + decay + 0.03);
-  });
-  window.setTimeout(() => void context.close(), 3900);
-  return true;
 }
 
 const particles = Array.from({ length: 68 }, (_, index) => {
@@ -122,7 +123,7 @@ export function OpeningReveal() {
 
     let soundTimer = 0;
     let soundAttempting = false;
-    const interactionEvents = ["pointerdown", "touchstart", "keydown"] as const;
+    const interactionEvents = ["pointerdown", "pointerup", "touchend", "click", "keydown"] as const;
     const removeSoundFallback = () => {
       interactionEvents.forEach((eventName) => window.removeEventListener(eventName, trySound));
     };
@@ -207,3 +208,4 @@ export function OpeningReveal() {
     </div>
   );
 }
+

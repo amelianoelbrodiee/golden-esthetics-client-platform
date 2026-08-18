@@ -22,7 +22,7 @@ export function MobileNav() {
     <div className={open ? "mobile-sheet-backdrop open" : "mobile-sheet-backdrop"} onClick={close} aria-hidden="true" />
     <div className={open ? "mobile-sheet open" : "mobile-sheet"} role="dialog" aria-modal="true" aria-label="Site menu" aria-hidden={!open}>
       <span className="mobile-sheet-handle" />
-      <p className="mobile-sheet-title">Explore Golden</p>
+      <p className="mobile-sheet-eyebrow">Explore</p><p className="mobile-sheet-title">Golden Esthetics</p>
       <div className="mobile-sheet-links">
         {menu.map(item => <a key={item.href} href={item.href} onClick={close}>{item.label}</a>)}
       </div>

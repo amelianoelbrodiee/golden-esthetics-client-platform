@@ -249,3 +249,11 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:120;o
 }
 /* header should scroll away, not follow down the page (bottom nav handles persistent nav on mobile) */
 .site-header{position:relative;top:auto}
+/* smoother hero -> monogram flow: match the dark greens (kills the seam) */
+.hero{background:radial-gradient(125% 110% at 76% 0%,#34442f 0%,#202c1d 52%,#1d271b 100%)}
+@media(max-width:800px){
+ /* more air between the copy/trust-row and the portrait */
+ .hero-inner{gap:56px;padding-block:56px 84px}
+ /* let the monogram breathe instead of jamming the seam */
+ .about-preview .about-art{min-height:340px}
+}

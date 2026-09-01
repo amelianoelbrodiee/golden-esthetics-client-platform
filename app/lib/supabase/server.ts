@@ -10,6 +10,8 @@ function getConfig() {
   };
 }
 
+const databaseSchema = "golden_esthetics";
+
 export function isSupabaseConfigured() {
   const { url, key } = getConfig();
   return Boolean(url && key);
@@ -20,6 +22,7 @@ export function getSupabasePublicClient() {
   const { url, key } = getConfig();
   if (!url || !key) return (publicClient = null);
   publicClient = createClient(url, key, {
+    db: { schema: databaseSchema },
     auth: { persistSession: false, autoRefreshToken: false },
     global: { headers: { "X-Client-Info": "golden-esthetics-web" } },
   });
@@ -30,6 +33,7 @@ export function getSupabaseUserClient(accessToken: string) {
   const { url, key } = getConfig();
   if (!url || !key) return null;
   return createClient(url, key, {
+    db: { schema: databaseSchema },
     auth: { persistSession: false, autoRefreshToken: false },
     global: {
       headers: {
@@ -46,9 +50,9 @@ export function getSupabaseAdminClient() {
   const secretKey = process.env.SUPABASE_SECRET_KEY;
   if (!url || !secretKey) return (adminClient = null);
   adminClient = createClient(url, secretKey, {
+    db: { schema: databaseSchema },
     auth: { persistSession: false, autoRefreshToken: false },
     global: { headers: { "X-Client-Info": "golden-esthetics-newsletter" } },
   });
   return adminClient;
 }
-

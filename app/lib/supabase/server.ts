@@ -1,7 +1,9 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-let publicClient: SupabaseClient | null | undefined;
-let adminClient: SupabaseClient | null | undefined;
+type ConfiguredSupabaseClient = SupabaseClient<any, any, any, any, any>;
+
+let publicClient: ConfiguredSupabaseClient | null | undefined;
+let adminClient: ConfiguredSupabaseClient | null | undefined;
 
 function getConfig() {
   return {
